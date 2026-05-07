@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Loại hình du lịch – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-wrapper">
+      <nav class="top-nav fade-up">
+        <a href="step1.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Loại hình du lịch</span>
+        <span class="nav-step">2/6</span>
+      </nav>
+
+      <div class="progress-bar-wrap fade-up fade-up-1">
+        <div class="progress-segment done"></div>
+        <div class="progress-segment active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <div class="scroll-content">
+        <div class="section-header fade-up fade-up-2">
+          <h2>Chuyến đi này là…? 🌟</h2>
+          <p>Để gợi ý phù hợp nhất, hãy cho tôi biết mục đích chuyến đi</p>
+        </div>
+
+        <div class="choice-grid fade-up fade-up-2" id="type-grid">
+          <div class="choice-card" data-val="nghi-duong" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">🏖️</div>
+            <div class="card-label">Nghỉ dưỡng</div>
+            <div class="card-desc">Thư giãn, tái nạp năng lượng</div>
+          </div>
+          <div class="choice-card" data-val="gia-dinh" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">👨‍👩‍👧‍👦</div>
+            <div class="card-label">Gia đình</div>
+            <div class="card-desc">Phù hợp cả trẻ nhỏ</div>
+          </div>
+          <div class="choice-card" data-val="cap-doi" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">💑</div>
+            <div class="card-label">Cặp đôi</div>
+            <div class="card-desc">Lãng mạn, riêng tư</div>
+          </div>
+          <div class="choice-card" data-val="ban-be" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">🧑‍🤝‍🧑</div>
+            <div class="card-label">Bạn bè</div>
+            <div class="card-desc">Vui vẻ, năng động</div>
+          </div>
+          <div class="choice-card" data-val="chill" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">☕</div>
+            <div class="card-label">Chill / Thư giãn</div>
+            <div class="card-desc">Chậm rãi, không vội</div>
+          </div>
+          <div class="choice-card" data-val="tuan-trang-mat" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">💍</div>
+            <div class="card-label">Tuần trăng mật</div>
+            <div class="card-desc">Đặc biệt, xa xỉ</div>
+          </div>
+          <div class="choice-card" data-val="bien" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">🌊</div>
+            <div class="card-label">Du lịch biển</div>
+            <div class="card-desc">Nắng, cát, biển xanh</div>
+          </div>
+          <div class="choice-card" data-val="kham-pha" onclick="selectType(this)">
+            <div class="check-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="card-icon">🧭</div>
+            <div class="card-label">Khám phá</div>
+            <div class="card-desc">Nhiều điểm, phiêu lưu</div>
+          </div>
+        </div>
+        <div style="height: 100px"></div>
+      </div>
+
+      <div class="bottom-cta">
+        <button class="btn-primary" id="next-btn" onclick="goNext()" disabled>
+          Tiếp theo <span>→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selected = null;
+
+    function selectType(el) {
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selected = el.dataset.val;
+      document.getElementById('next-btn').disabled = false;
+    }
+
+    function goNext() {
+      const s = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+      s.travelType = selected;
+      sessionStorage.setItem('tripState', JSON.stringify(s));
+      window.location.href = 'step3.html';
+    }
+  </script>
+</body>
+</html>

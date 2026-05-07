@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Thành viên – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .member-section {
+      margin: 0 var(--s5);
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      border-radius: var(--r-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .child-age-section {
+      padding: var(--s4) var(--s5);
+    }
+    .child-age-label {
+      font-size: 14px; font-weight: 700; color: var(--neutral-700); margin-bottom: var(--s3);
+    }
+    .age-chips {
+      display: flex; gap: var(--s2); flex-wrap: wrap;
+    }
+    .age-chip {
+      padding: 6px 14px;
+      border-radius: var(--r-full);
+      border: 1.5px solid var(--neutral-200);
+      font-size: 13px; font-weight: 600; color: var(--neutral-500);
+      background: var(--white);
+      cursor: pointer;
+      transition: var(--t-fast);
+    }
+    .age-chip:hover  { border-color: var(--accent-400); color: var(--accent-500); }
+    .age-chip.active { background: var(--accent-500); border-color: var(--accent-500); color: var(--white); }
+
+    .summary-card {
+      margin: var(--s4) var(--s5);
+      padding: var(--s4);
+      background: linear-gradient(135deg, var(--primary-50) 0%, #ebfeff 100%);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--primary-100);
+    }
+    .summary-label { font-size: 13px; font-weight: 600; color: var(--neutral-500); margin-bottom: var(--s2); }
+    .summary-value { font-size: 17px; font-weight: 700; color: var(--primary-700); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-wrapper">
+      <nav class="top-nav fade-up">
+        <a href="step2.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Thành viên</span>
+        <span class="nav-step">3/6</span>
+      </nav>
+
+      <div class="progress-bar-wrap fade-up fade-up-1">
+        <div class="progress-segment done"></div>
+        <div class="progress-segment done"></div>
+        <div class="progress-segment active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <div class="scroll-content">
+        <div class="section-header fade-up fade-up-2">
+          <h2>Chuyến đi có bao nhiêu người? 👥</h2>
+          <p>Giúp chúng tôi gợi ý chỗ ở và hoạt động phù hợp</p>
+        </div>
+
+        <div class="member-section fade-up fade-up-2">
+          <div class="counter-row">
+            <div class="counter-info">
+              <div class="counter-label">👩 Người lớn</div>
+              <div class="counter-sub">Từ 18 tuổi trở lên</div>
+            </div>
+            <div class="counter-ctrl">
+              <button class="counter-btn" id="adult-minus" onclick="changeCount('adult', -1)">−</button>
+              <span class="counter-val" id="adult-val">2</span>
+              <button class="counter-btn" id="adult-plus"  onclick="changeCount('adult', +1)">+</button>
+            </div>
+          </div>
+
+          <div class="counter-row">
+            <div class="counter-info">
+              <div class="counter-label">🧒 Trẻ em</div>
+              <div class="counter-sub">Dưới 18 tuổi</div>
+            </div>
+            <div class="counter-ctrl">
+              <button class="counter-btn" id="child-minus" onclick="changeCount('child', -1)">−</button>
+              <span class="counter-val" id="child-val">0</span>
+              <button class="counter-btn" id="child-plus"  onclick="changeCount('child', +1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Child ages - shown when children > 0 -->
+        <div id="child-age-wrap" style="display:none" class="fade-up fade-up-3">
+          <div class="child-age-section">
+            <div class="child-age-label">Độ tuổi trẻ em</div>
+            <div class="age-chips">
+              <div class="age-chip" data-age="<2" onclick="toggleAge(this)">< 2 tuổi</div>
+              <div class="age-chip" data-age="2-5" onclick="toggleAge(this)">2–5 tuổi</div>
+              <div class="age-chip" data-age="6-10" onclick="toggleAge(this)">6–10 tuổi</div>
+              <div class="age-chip" data-age="11-17" onclick="toggleAge(this)">11–17 tuổi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-card fade-up fade-up-4" id="summary">
+          <div class="summary-label">📋 Tóm tắt nhóm</div>
+          <div class="summary-value" id="summary-text">2 người lớn</div>
+        </div>
+
+        <div style="height: 100px"></div>
+      </div>
+
+      <div class="bottom-cta">
+        <button class="btn-primary" onclick="goNext()">
+          Tiếp theo <span>→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adults = 2, children = 0;
+    const childAges = new Set();
+
+    function changeCount(type, delta) {
+      if (type === 'adult') {
+        adults = Math.max(1, adults + delta);
+        document.getElementById('adult-val').textContent = adults;
+        document.getElementById('adult-minus').disabled = adults <= 1;
+      } else {
+        children = Math.max(0, children + delta);
+        document.getElementById('child-val').textContent = children;
+        document.getElementById('child-minus').disabled = children <= 0;
+        document.getElementById('child-age-wrap').style.display = children > 0 ? 'block' : 'none';
+      }
+      updateSummary();
+    }
+
+    function toggleAge(el) {
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) childAges.add(el.dataset.age);
+      else childAges.delete(el.dataset.age);
+    }
+
+    function updateSummary() {
+      let txt = `${adults} người lớn`;
+      if (children > 0) txt += `, ${children} trẻ em`;
+      document.getElementById('summary-text').textContent = txt;
+    }
+
+    document.getElementById('adult-minus').disabled = true;
+    document.getElementById('child-minus').disabled = true;
+
+    function goNext() {
+      const s = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+      s.adults = adults;
+      s.children = children;
+      s.childAges = [...childAges];
+      sessionStorage.setItem('tripState', JSON.stringify(s));
+      window.location.href = 'step4.html';
+    }
+  </script>
+</body>
+</html>

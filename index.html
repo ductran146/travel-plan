@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>LữHành – Lên Kế Hoạch Du Lịch</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: var(--primary-950); padding: 0; }
+    .container { background: transparent; box-shadow: none; }
+    @media (min-width: 480px) {
+      body { background: #e9e5ff; }
+      .container {
+        background: transparent;
+        box-shadow: 0 24px 80px rgba(93,48,247,.2);
+      }
+    }
+
+    .recent-trips {
+      padding: var(--s4) var(--s5) 0;
+      animation: fadeUp .8s .6s both;
+    }
+    .recent-title {
+      font-size: 12px; font-weight: 700;
+      color: rgba(255,255,255,.4);
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: var(--s3);
+    }
+    .trip-pill {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: var(--s3) var(--s4);
+      background: rgba(255,255,255,.08);
+      border-radius: var(--r-xl);
+      margin-bottom: var(--s2);
+      backdrop-filter: blur(8px);
+      transition: var(--t-fast);
+    }
+    .trip-pill:hover { background: rgba(255,255,255,.14); }
+    .trip-pill-icon { font-size: 20px; }
+    .trip-pill-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.85); flex: 1; }
+    .trip-pill-date { font-size: 11px; color: rgba(255,255,255,.4); }
+    .trip-pill-arrow { color: rgba(255,255,255,.3); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="splash">
+      <div class="splash-orb splash-orb-1"></div>
+      <div class="splash-orb splash-orb-2"></div>
+
+      <div class="splash-logo">🗺️</div>
+      <h1 class="splash-brand">Lữ<em>Hành</em></h1>
+      <p class="splash-tagline">Lên kế hoạch. Khám phá. Tận hưởng.</p>
+
+      <a href="step1.html" class="splash-cta">
+        <span>✈️</span>
+        Lên kế hoạch ngay
+      </a>
+
+      <div class="splash-features">
+        <div class="splash-feat">
+          <span>🗓️</span>
+          <div>Kế hoạch<br>từng ngày</div>
+        </div>
+        <div class="splash-feat">
+          <span>📍</span>
+          <div>Gợi ý<br>địa điểm</div>
+        </div>
+        <div class="splash-feat">
+          <span>⏱️</span>
+          <div>Tính<br>ETA</div>
+        </div>
+        <div class="splash-feat">
+          <span>🧭</span>
+          <div>Xem<br>hành trình</div>
+        </div>
+      </div>
+
+      <div class="recent-trips">
+        <div class="recent-title">Chuyến đi gần đây</div>
+        <a href="itinerary.html?trip=ninhbinh" class="trip-pill">
+          <span class="trip-pill-icon">⛩️</span>
+          <span class="trip-pill-name">Ninh Bình 3 ngày</span>
+          <span class="trip-pill-date">23/04</span>
+          <span class="trip-pill-arrow">›</span>
+        </a>
+        <a href="itinerary.html?trip=hue" class="trip-pill">
+          <span class="trip-pill-icon">🌊</span>
+          <span class="trip-pill-name">Huế – Quảng Bình</span>
+          <span class="trip-pill-date">10/03</span>
+          <span class="trip-pill-arrow">›</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

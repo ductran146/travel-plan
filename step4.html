@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Lựa chọn hành trình – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .select-btn {
+      width: 100%; padding: 10px var(--s4);
+      background: var(--primary-600);
+      color: var(--white);
+      border-radius: var(--r-lg);
+      font-size: 14px; font-weight: 700;
+      margin-top: var(--s3);
+      transition: var(--t-base);
+    }
+    .select-btn:hover { background: var(--primary-700); }
+    .option-card.active .select-btn { background: var(--success); }
+
+    .option-header {
+      padding: var(--s6) var(--s5) var(--s3);
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .option-count-badge {
+      background: var(--primary-100);
+      color: var(--primary-700);
+      font-size: 12px; font-weight: 700;
+      padding: 3px var(--s2); border-radius: var(--r-full);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-wrapper">
+      <nav class="top-nav">
+        <a href="step3.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Lựa chọn hành trình</span>
+        <span class="nav-step">4/6</span>
+      </nav>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-segment done"></div>
+        <div class="progress-segment done"></div>
+        <div class="progress-segment done"></div>
+        <div class="progress-segment active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading" class="loading-screen">
+        <div class="loading-icon">✨</div>
+        <div class="loading-text" id="loading-text">Đang phân tích hành trình...</div>
+        <div class="loading-dots">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+      </div>
+
+      <!-- Content (hidden initially) -->
+      <div id="content" style="display:none" class="scroll-content">
+        <div class="option-header">
+          <div>
+            <div style="font-size:20px;font-weight:800;color:var(--neutral-900)">Chọn kiểu hành trình ✨</div>
+            <div style="font-size:14px;color:var(--neutral-400);margin-top:2px">Phù hợp với <span id="trip-info" style="color:var(--primary-600);font-weight:700"></span></div>
+          </div>
+          <span class="option-count-badge">3 lựa chọn</span>
+        </div>
+
+        <!-- Option 1: Thoải mái -->
+        <div class="option-card" id="opt1" onclick="selectOption('thoatmai', this)">
+          <div class="option-card-hero">
+            <div class="hero-bg" style="background: linear-gradient(135deg,#e0f7fa,#b2ebf2)">🏖️</div>
+            <span class="option-badge badge-thoatmai">Thoải mái</span>
+          </div>
+          <div class="option-card-body">
+            <div class="option-card-title">Hành trình thư thái</div>
+            <div class="option-card-meta">
+              <span class="meta-chip">📍 <span id="opt1-stops">4 điểm</span></span>
+              <span class="meta-chip">⏱️ <span id="opt1-days">Vừa phải</span></span>
+              <span class="meta-chip">😌 Ít mệt</span>
+            </div>
+            <div class="option-card-stops" id="opt1-chips"></div>
+            <button class="select-btn">Chọn hành trình này →</button>
+          </div>
+        </div>
+
+        <!-- Option 2: Khám phá -->
+        <div class="option-card" id="opt2" onclick="selectOption('khampha', this)">
+          <div class="option-card-hero">
+            <div class="hero-bg" style="background: linear-gradient(135deg,#e8f5e9,#c8e6c9)">🧭</div>
+            <span class="option-badge badge-khampha">Khám phá</span>
+          </div>
+          <div class="option-card-body">
+            <div class="option-card-title">Hành trình khám phá</div>
+            <div class="option-card-meta">
+              <span class="meta-chip">📍 <span id="opt2-stops">6 điểm</span></span>
+              <span class="meta-chip">⏱️ Dày lịch</span>
+              <span class="meta-chip">⚡ Năng động</span>
+            </div>
+            <div class="option-card-stops" id="opt2-chips"></div>
+            <button class="select-btn">Chọn hành trình này →</button>
+          </div>
+        </div>
+
+        <!-- Option 3: Chill -->
+        <div class="option-card" id="opt3" onclick="selectOption('chill', this)">
+          <div class="option-card-hero">
+            <div class="hero-bg" style="background: linear-gradient(135deg,#fff8e1,#ffecb3)">🌅</div>
+            <span class="option-badge badge-chill">Chill</span>
+          </div>
+          <div class="option-card-body">
+            <div class="option-card-title">Hành trình chill</div>
+            <div class="option-card-meta">
+              <span class="meta-chip">📍 <span id="opt3-stops">3 điểm</span></span>
+              <span class="meta-chip">⏱️ Thong thả</span>
+              <span class="meta-chip">🌊 Biển / thư giãn</span>
+            </div>
+            <div class="option-card-stops" id="opt3-chips"></div>
+            <button class="select-btn">Chọn hành trình này →</button>
+          </div>
+        </div>
+
+        <div style="height:100px"></div>
+      </div>
+
+      <div class="bottom-cta" id="bottom-cta" style="display:none">
+        <button class="btn-primary" id="next-btn" onclick="goNext()" disabled>
+          Xem chi tiết hành trình →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dataset
+    const ROUTES = {
+      'Ninh Bình': {
+        stops: ['Tràng An','Hang Múa','Tam Cốc','Chùa Bái Đính','Vân Long','Cúc Phương'],
+        km: 96, baseHours: 2
+      },
+      'Huế': {
+        stops: ['Đại Nội','Chùa Thiên Mụ','Đầm Lập An','Lăng Tự Đức','Chợ Đông Ba','Phá Tam Giang'],
+        km: 658, baseHours: 11
+      },
+      'Quảng Bình': {
+        stops: ['Hang Sơn Đoòng','Phong Nha','Hang Tối','Suối Moọc','Chày Lập','Nhà thờ Tam Tòa'],
+        km: 500, baseHours: 9
+      },
+      'Nghệ An': {
+        stops: ['Biển Cửa Lò','VinWonders Cửa Hội','Làng Sen quê Bác','Đền Cờn','Bãi Lữ'],
+        km: 290, baseHours: 5
+      },
+      'Hà Tĩnh': {
+        stops: ['Biển Thiên Cầm','Ngã ba Đồng Lộc','Hồ Kẻ Gỗ','Đèo Ngang','Vũng Áng'],
+        km: 340, baseHours: 6
+      }
+    };
+
+    const state = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+    let selectedOption = null;
+
+    // Find matching route data
+    function getRouteData() {
+      const to = state.to || '';
+      for (const [key, val] of Object.entries(ROUTES)) {
+        if (to.toLowerCase().includes(key.toLowerCase())) return { ...val, name: key };
+      }
+      // default
+      return { ...ROUTES['Ninh Bình'], name: 'Ninh Bình' };
+    }
+
+    const msgs = [
+      'Đang phân tích hành trình...',
+      'Tính toán thời gian di chuyển...',
+      'Gợi ý điểm tham quan...',
+      'Sắp xong rồi! ✨'
+    ];
+    let mi = 0;
+    const lt = document.getElementById('loading-text');
+    const interval = setInterval(() => { lt.textContent = msgs[++mi % msgs.length]; }, 800);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      document.getElementById('bottom-cta').style.display = 'block';
+
+      const route = getRouteData();
+      document.getElementById('trip-info').textContent =
+        `${state.from || 'Hà Nội'} → ${state.to || 'Ninh Bình'} · ${state.days || 3} ngày`;
+
+      // Build options
+      buildOption('opt1-chips', route.stops.slice(0,4), ['opt1-stops','opt1-days'], [4,'Vừa phải']);
+      buildOption('opt2-chips', route.stops.slice(0,6), ['opt2-stops','opt2-days'], [6,'Dày lịch']);
+      buildOption('opt3-chips', route.stops.slice(0,3), ['opt3-stops','opt3-days'], [3,'Thong thả']);
+
+      // Animate in
+      document.querySelectorAll('.option-card').forEach((c,i) => {
+        c.style.opacity = 0;
+        c.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          c.style.transition = 'all 0.4s ease';
+          c.style.opacity = 1;
+          c.style.transform = 'translateY(0)';
+        }, 100 + i * 120);
+      });
+    }, 2200);
+
+    function buildOption(chipId, stops, meta, vals) {
+      const el = document.getElementById(chipId);
+      el.innerHTML = stops.map(s => `<span class="stop-chip">${s}</span>`).join('');
+    }
+
+    function selectOption(type, card) {
+      selectedOption = type;
+      document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      document.getElementById('next-btn').disabled = false;
+
+      // update button text
+      card.querySelector('.select-btn').textContent = '✓ Đã chọn';
+    }
+
+    function goNext() {
+      const s = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+      s.optionType = selectedOption;
+      sessionStorage.setItem('tripState', JSON.stringify(s));
+      window.location.href = 'step5.html';
+    }
+  </script>
+</body>
+</html>

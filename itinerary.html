@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Xem hành trình – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .plan-hero {
+      background: linear-gradient(150deg, var(--primary-950), #2d1080);
+      padding: var(--s8) var(--s5) var(--s6);
+      position: relative; overflow: hidden;
+    }
+    .plan-hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 32px; background: var(--neutral-50);
+      border-radius: 32px 32px 0 0;
+    }
+    .plan-hero-title { font-family: var(--font-display); font-size: 28px; font-weight: 900; color: white; line-height: 1.2; }
+    .plan-hero-title em { color: var(--accent-400); font-style: normal; }
+    .plan-hero-sub { font-size: 14px; color: rgba(255,255,255,.55); margin-top: var(--s2); }
+    .plan-hero-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(0,180,220,.18) 0%, transparent 70%); width: 280px; height: 280px; top: -60px; right: -60px; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-wrapper">
+      <nav class="top-nav">
+        <a href="index.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Chi tiết hành trình</span>
+        <span></span>
+      </nav>
+
+      <div class="scroll-content" id="content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const trip = params.get('trip');
+
+    const TRIPS = {
+      ninhbinh: {
+        title: 'Ninh Bình', days: 3, from: 'Hà Nội', km: 96,
+        itinerary: [
+          { day: 1, items: [
+            { time:'07:30', icon:'🚗', name:'Xuất phát Hà Nội',        type:'Khởi hành',    dot:'start' },
+            { time:'09:30', icon:'⛩️', name:'Tràng An',               type:'Di tích',       dot:'stop' },
+            { time:'12:00', icon:'🍽️', name:'Ăn trưa – Cơm niêu',    type:'Ẩm thực',       dot:'eat' },
+            { time:'13:30', icon:'🏔️', name:'Hang Múa',               type:'Leo núi',       dot:'stop' },
+            { time:'17:00', icon:'🏨', name:'Nhận phòng',             type:'Lưu trú',       dot:'start' },
+          ]},
+          { day: 2, items: [
+            { time:'07:00', icon:'🚣', name:'Tam Cốc – Thuyền hang',  type:'Di tích',       dot:'stop' },
+            { time:'10:30', icon:'🛕', name:'Chùa Bái Đính',          type:'Tâm linh',      dot:'stop' },
+            { time:'12:30', icon:'🍽️', name:'Ăn trưa dê núi',        type:'Ẩm thực',       dot:'eat' },
+            { time:'15:00', icon:'🌿', name:'Vân Long – Quan sát',    type:'Thiên nhiên',   dot:'stop' },
+            { time:'18:00', icon:'🏨', name:'Nghỉ đêm Ninh Bình',    type:'Lưu trú',       dot:'start' },
+          ]},
+          { day: 3, items: [
+            { time:'08:00', icon:'🦋', name:'Vườn Quốc gia Cúc Phương',type:'Thiên nhiên', dot:'stop' },
+            { time:'11:30', icon:'🍽️', name:'Ăn trưa',               type:'Ẩm thực',       dot:'eat' },
+            { time:'13:00', icon:'🚗', name:'Về Hà Nội',              type:'Kết thúc',      dot:'start' },
+          ]},
+        ]
+      },
+      hue: {
+        title: 'Huế', days: 2, from: 'Đà Nẵng', km: 100,
+        itinerary: [
+          { day: 1, items: [
+            { time:'07:30', icon:'🚗', name:'Xuất phát Đà Nẵng',     type:'Khởi hành',    dot:'start' },
+            { time:'09:00', icon:'🏯', name:'Đại Nội Huế',           type:'Lịch sử',      dot:'stop' },
+            { time:'11:30', icon:'🛕', name:'Chùa Thiên Mụ',         type:'Tâm linh',     dot:'stop' },
+            { time:'12:30', icon:'🍽️', name:'Bún bò Huế chính gốc', type:'Ẩm thực',      dot:'eat' },
+            { time:'14:00', icon:'🌺', name:'Lăng Tự Đức',           type:'Lịch sử',      dot:'stop' },
+          ]},
+          { day: 2, items: [
+            { time:'08:00', icon:'🚤', name:'Phá Tam Giang',          type:'Du thuyền',    dot:'stop' },
+            { time:'10:30', icon:'🌊', name:'Đầm Lập An',            type:'Thiên nhiên',  dot:'stop' },
+            { time:'12:00', icon:'🍽️', name:'Cơm hến đặc sản',      type:'Ẩm thực',      dot:'eat' },
+            { time:'14:00', icon:'🛒', name:'Chợ Đông Ba',           type:'Mua sắm',      dot:'stop' },
+            { time:'16:00', icon:'🏠', name:'Về nhà',                type:'Kết thúc',     dot:'start' },
+          ]}
+        ]
+      }
+    };
+
+    const data = TRIPS[trip] || TRIPS.ninhbinh;
+
+    function addMinutes(hhmm, mins) {
+      const [h, m] = hhmm.split(':').map(Number);
+      const total = h * 60 + m + mins;
+      return `${String(Math.floor(total/60)%24).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+    }
+
+    let html = `
+      <div class="plan-hero">
+        <div class="plan-hero-orb"></div>
+        <div class="plan-hero-title">${data.title} <em>${data.days} ngày</em></div>
+        <div class="plan-hero-sub">📍 ${data.from} → ${data.title} · ${data.km} km</div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item"><div class="stat-val">${data.days}</div><div class="stat-label">Ngày</div></div>
+        <div class="stat-item"><div class="stat-val">${data.km}</div><div class="stat-label">Km</div></div>
+        <div class="stat-item"><div class="stat-val">${data.itinerary.reduce((s,d)=>s+d.items.filter(i=>i.dot==='stop').length,0)}</div><div class="stat-label">Điểm</div></div>
+        <div class="stat-item"><div class="stat-val">${Math.round(data.km/50*10)/10}h</div><div class="stat-label">Di chuyển</div></div>
+      </div>
+    `;
+
+    data.itinerary.forEach(day => {
+      html += `
+        <div class="timeline-day-header">
+          <div class="day-dot">${day.day}</div>
+          <span class="day-label">Ngày ${day.day}</span>
+        </div>
+        <div class="timeline-list">
+      `;
+      day.items.forEach(item => {
+        html += `
+          <div class="timeline-item">
+            <div class="tl-time">${item.time}</div>
+            <div class="tl-dot-wrap"><div class="tl-dot ${item.dot}">${item.icon}</div></div>
+            <div class="tl-card">
+              <div class="tl-card-title">${item.name}</div>
+              <div class="tl-card-sub">${item.type}</div>
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    });
+
+    html += `
+      <div style="padding:16px 20px">
+        <a href="step1.html" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none">
+          ✈️ Lên kế hoạch chuyến mới
+        </a>
+      </div>
+    `;
+
+    document.getElementById('content').innerHTML = html;
+  </script>
+</body>
+</html>

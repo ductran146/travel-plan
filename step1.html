@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Chọn hành trình – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .location-selector {
+      padding: var(--s2) var(--s5);
+    }
+    .location-card {
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      border-radius: var(--r-xl);
+      padding: var(--s4);
+      box-shadow: var(--shadow-sm);
+    }
+    .loc-row {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: var(--s3) 0;
+      border-bottom: 1px solid var(--neutral-100);
+    }
+    .loc-row:last-of-type { border-bottom: none; }
+    .loc-icon-wrap {
+      width: 36px; height: 36px;
+      border-radius: var(--r-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .loc-icon-wrap.from { background: var(--primary-50); }
+    .loc-icon-wrap.to   { background: #e8f5e9; }
+    .loc-meta { flex: 1; }
+    .loc-label { font-size: 11px; font-weight: 600; color: var(--neutral-400); text-transform: uppercase; letter-spacing: .04em; }
+    .loc-input {
+      width: 100%; background: none; border: none; outline: none;
+      font-size: 16px; font-weight: 700; color: var(--neutral-900);
+      font-family: var(--font-body);
+      padding: 2px 0;
+    }
+    .loc-input::placeholder { color: var(--neutral-300); font-weight: 400; }
+
+    .swap-btn {
+      width: 32px; height: 32px; flex-shrink: 0;
+      border-radius: var(--r-full);
+      border: 1.5px solid var(--neutral-200);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: var(--t-fast);
+    }
+    .swap-btn:hover { background: var(--primary-50); border-color: var(--primary-300); }
+
+    .route-divider {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: 0 var(--s1);
+    }
+    .route-divider-line { flex: 1; height: 1px; background: var(--neutral-100); }
+    .route-divider-dots {
+      display: flex; flex-direction: column; gap: 3px;
+      color: var(--neutral-300);
+    }
+    .route-divider-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+
+    .days-slider-wrap {
+      padding: var(--s4) var(--s5);
+    }
+    .days-row {
+      display: flex; gap: var(--s2); overflow-x: auto;
+      padding-bottom: var(--s2);
+      scrollbar-width: none;
+    }
+    .days-row::-webkit-scrollbar { display: none; }
+    .day-btn {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      border-radius: var(--r-xl);
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      font-size: 15px; font-weight: 700;
+      color: var(--neutral-600);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1px;
+      transition: var(--t-fast);
+    }
+    .day-btn span { font-size: 10px; font-weight: 500; color: var(--neutral-400); }
+    .day-btn:hover { border-color: var(--primary-300); background: var(--primary-50); }
+    .day-btn.active {
+      background: var(--primary-600);
+      border-color: var(--primary-600);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(93,48,247,.3);
+    }
+    .day-btn.active span { color: rgba(255,255,255,.7); }
+
+    .vehicle-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--s3);
+      padding: 0 var(--s5);
+    }
+    .vehicle-btn {
+      padding: var(--s3) var(--s2);
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      border-radius: var(--r-xl);
+      display: flex; flex-direction: column; align-items: center; gap: var(--s2);
+      font-size: 11px; font-weight: 600; color: var(--neutral-500);
+      transition: var(--t-fast);
+    }
+    .vehicle-btn .v-icon { font-size: 22px; }
+    .vehicle-btn:hover { border-color: var(--primary-300); background: var(--primary-50); }
+    .vehicle-btn.active {
+      border-color: var(--primary-600); background: var(--primary-50); color: var(--primary-700);
+    }
+
+    .popular-routes {
+      padding: var(--s3) var(--s5);
+      display: flex; flex-direction: column; gap: var(--s2);
+    }
+    .route-suggest {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: var(--s3) var(--s4);
+      background: var(--white);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--r-xl);
+      cursor: pointer;
+      transition: var(--t-fast);
+    }
+    .route-suggest:hover { background: var(--primary-50); border-color: var(--primary-200); }
+    .route-suggest .rs-icon { font-size: 20px; }
+    .route-suggest .rs-name { font-size: 14px; font-weight: 600; color: var(--neutral-700); flex: 1; }
+    .route-suggest .rs-km { font-size: 12px; color: var(--neutral-400); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-wrapper">
+      <!-- Nav -->
+      <nav class="top-nav fade-up">
+        <a href="index.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Chọn hành trình</span>
+        <span class="nav-step">1/6</span>
+      </nav>
+
+      <!-- Progress -->
+      <div class="progress-bar-wrap fade-up fade-up-1">
+        <div class="progress-segment active"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+        <div class="progress-segment"></div>
+      </div>
+
+      <div class="scroll-content">
+        <!-- Location -->
+        <div class="section-header fade-up fade-up-2">
+          <h2>Bạn muốn đi đâu? ✈️</h2>
+          <p>Chọn điểm xuất phát và điểm đến của chuyến đi</p>
+        </div>
+
+        <div class="location-selector fade-up fade-up-2">
+          <div class="location-card">
+            <div class="loc-row">
+              <div class="loc-icon-wrap from">📍</div>
+              <div class="loc-meta">
+                <div class="loc-label">Xuất phát</div>
+                <input class="loc-input" id="from-input" type="text" placeholder="Hà Nội, Hồ Chí Minh...">
+              </div>
+            </div>
+            <div class="route-divider">
+              <div class="route-divider-line"></div>
+              <div class="route-divider-dots">
+                <div class="route-divider-dot"></div>
+                <div class="route-divider-dot"></div>
+                <div class="route-divider-dot"></div>
+              </div>
+              <button class="swap-btn" onclick="swapLocations()">⇅</button>
+              <div class="route-divider-line"></div>
+            </div>
+            <div class="loc-row">
+              <div class="loc-icon-wrap to">🏁</div>
+              <div class="loc-meta">
+                <div class="loc-label">Điểm đến</div>
+                <input class="loc-input" id="to-input" type="text" placeholder="Ninh Bình, Huế, Đà Lạt...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Popular Routes -->
+        <div class="section-header fade-up fade-up-3" style="padding-bottom:0">
+          <h2>Gợi ý tuyến phổ biến 🔥</h2>
+        </div>
+        <div class="popular-routes fade-up fade-up-3">
+          <div class="route-suggest" onclick="fillRoute('Hà Nội','Ninh Bình')">
+            <span class="rs-icon">⛩️</span>
+            <span class="rs-name">Hà Nội → Ninh Bình</span>
+            <span class="rs-km">~96 km</span>
+          </div>
+          <div class="route-suggest" onclick="fillRoute('Hà Nội','Huế')">
+            <span class="rs-icon">🏯</span>
+            <span class="rs-name">Hà Nội → Huế</span>
+            <span class="rs-km">~658 km</span>
+          </div>
+          <div class="route-suggest" onclick="fillRoute('Hà Nội','Quảng Bình')">
+            <span class="rs-icon">🏔️</span>
+            <span class="rs-name">Hà Nội → Quảng Bình</span>
+            <span class="rs-km">~500 km</span>
+          </div>
+          <div class="route-suggest" onclick="fillRoute('Hà Nội','Nghệ An')">
+            <span class="rs-icon">🌊</span>
+            <span class="rs-name">Hà Nội → Cửa Lò</span>
+            <span class="rs-km">~290 km</span>
+          </div>
+        </div>
+
+        <!-- Số ngày -->
+        <div class="section-header fade-up fade-up-3">
+          <h2>Đi mấy ngày? 🗓️</h2>
+          <p>Chọn thời gian phù hợp với lịch trình</p>
+        </div>
+        <div class="days-slider-wrap fade-up fade-up-3">
+          <div class="days-row" id="days-row">
+            <!-- filled by JS -->
+          </div>
+        </div>
+
+        <!-- Phương tiện -->
+        <div class="section-header fade-up fade-up-4">
+          <h2>Phương tiện di chuyển 🚗</h2>
+        </div>
+        <div class="vehicle-grid fade-up fade-up-4">
+          <button class="vehicle-btn active" data-v="xe-may" onclick="selectVehicle(this)">
+            <span class="v-icon">🏍️</span>Xe máy
+          </button>
+          <button class="vehicle-btn" data-v="oto" onclick="selectVehicle(this)">
+            <span class="v-icon">🚗</span>Ô tô
+          </button>
+          <button class="vehicle-btn" data-v="tau" onclick="selectVehicle(this)">
+            <span class="v-icon">🚂</span>Tàu hỏa
+          </button>
+          <button class="vehicle-btn" data-v="may-bay" onclick="selectVehicle(this)">
+            <span class="v-icon">✈️</span>Máy bay
+          </button>
+        </div>
+
+        <div style="height: 100px"></div>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div class="bottom-cta">
+        <button class="btn-primary" id="next-btn" onclick="goNext()" disabled>
+          Tiếp theo <span>→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    const state = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+    let days = state.days || 0;
+    let vehicle = state.vehicle || 'xe-may';
+
+    // Init days row
+    const daysRow = document.getElementById('days-row');
+    for (let i = 1; i <= 10; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'day-btn' + (i === days ? ' active' : '');
+      btn.innerHTML = `${i}<span>ngày</span>`;
+      btn.onclick = () => selectDays(i);
+      daysRow.appendChild(btn);
+    }
+
+    // Restore state
+    if (state.from) document.getElementById('from-input').value = state.from;
+    if (state.to)   document.getElementById('to-input').value   = state.to;
+    document.querySelectorAll('.vehicle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.v === vehicle);
+    });
+
+    function selectDays(d) {
+      days = d;
+      document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === d));
+      checkNext();
+    }
+
+    function selectVehicle(el) {
+      vehicle = el.dataset.v;
+      document.querySelectorAll('.vehicle-btn').forEach(b => b.classList.toggle('active', b === el));
+    }
+
+    function fillRoute(from, to) {
+      document.getElementById('from-input').value = from;
+      document.getElementById('to-input').value   = to;
+      checkNext();
+    }
+
+    function swapLocations() {
+      const f = document.getElementById('from-input');
+      const t = document.getElementById('to-input');
+      [f.value, t.value] = [t.value, f.value];
+    }
+
+    function checkNext() {
+      const from = document.getElementById('from-input').value.trim();
+      const to   = document.getElementById('to-input').value.trim();
+      document.getElementById('next-btn').disabled = !(from && to && days > 0);
+    }
+
+    document.getElementById('from-input').addEventListener('input', checkNext);
+    document.getElementById('to-input').addEventListener('input', checkNext);
+
+    function goNext() {
+      const s = {
+        from: document.getElementById('from-input').value.trim(),
+        to:   document.getElementById('to-input').value.trim(),
+        days, vehicle
+      };
+      sessionStorage.setItem('tripState', JSON.stringify(s));
+      window.location.href = 'step2.html';
+    }
+  </script>
+</body>
+</html>

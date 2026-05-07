@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Kế hoạch cuối cùng – LữHành</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Generating animation */
+    .gen-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: linear-gradient(150deg, var(--primary-950), #2d1080);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: var(--s6);
+    }
+    .gen-logo { font-size: 56px; animation: pulse 1.5s infinite; }
+    .gen-title { font-family: var(--font-display); font-size: 28px; color: white; font-weight: 700; }
+    .gen-sub   { font-size: 15px; color: rgba(255,255,255,.5); }
+    .gen-bar-wrap { width: 200px; height: 4px; background: rgba(255,255,255,.15); border-radius: var(--r-full); overflow: hidden; }
+    .gen-bar { height: 100%; background: var(--accent-400); border-radius: var(--r-full); width: 0%; transition: width .3s ease; }
+
+    /* Hero */
+    .plan-hero {
+      background: linear-gradient(150deg, var(--primary-950) 0%, #2d1080 60%, var(--primary-800) 100%);
+      padding: var(--s8) var(--s5) var(--s6);
+      position: relative; overflow: hidden;
+    }
+    .plan-hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: var(--neutral-50);
+      border-radius: 40px 40px 0 0;
+    }
+    .plan-hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,180,220,.18) 0%, transparent 70%);
+      width: 280px; height: 280px;
+      top: -60px; right: -60px;
+      pointer-events: none;
+    }
+    .plan-hero-title {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 900; color: white;
+      position: relative; z-index: 1; line-height: 1.2;
+    }
+    .plan-hero-title em { color: var(--accent-400); font-style: normal; }
+    .plan-hero-sub { font-size: 14px; color: rgba(255,255,255,.55); margin-top: var(--s2); position: relative; z-index: 1; }
+    .plan-hero-meta {
+      display: flex; gap: var(--s3); margin-top: var(--s4); flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .plan-hero-chip {
+      padding: 6px 14px;
+      background: rgba(255,255,255,.12);
+      border-radius: var(--r-full);
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    /* Map visual */
+    .route-map {
+      margin: var(--s4) var(--s5);
+      background: linear-gradient(135deg,#e3f2fd 0%,#e8f5e9 50%,#fff8e1 100%);
+      border-radius: var(--r-2xl);
+      padding: var(--s4) var(--s5);
+      position: relative;
+      overflow: hidden;
+      min-height: 140px;
+    }
+    .route-map::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23c8d6e5' fill-opacity='.4'/%3E%3C/svg%3E") repeat;
+    }
+    .route-map-title { font-size: 12px; font-weight: 700; color: var(--neutral-500); text-transform: uppercase; letter-spacing: .05em; position: relative; z-index:1; }
+    .route-path {
+      display: flex; align-items: center; gap: var(--s2);
+      margin-top: var(--s3); flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .route-node {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .route-node-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .route-node-dot.active { background: var(--primary-600); }
+    .route-node-dot.active span { filter: brightness(0) invert(1); }
+    .route-node-label { font-size: 11px; font-weight: 600; color: var(--neutral-600); text-align: center; max-width: 56px; }
+    .route-arrow { color: var(--primary-400); font-size: 16px; }
+
+    /* Day tabs */
+    .day-tabs {
+      display: flex; gap: var(--s2);
+      padding: var(--s3) var(--s5);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .day-tabs::-webkit-scrollbar { display: none; }
+    .day-tab {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: var(--r-full);
+      font-size: 13px; font-weight: 700;
+      background: var(--white);
+      border: 1.5px solid var(--neutral-200);
+      color: var(--neutral-500);
+      transition: var(--t-fast);
+    }
+    .day-tab.active {
+      background: var(--primary-600);
+      border-color: var(--primary-600);
+      color: var(--white);
+      box-shadow: 0 3px 12px rgba(93,48,247,.3);
+    }
+
+    /* CTA buttons */
+    .cta-row { display: flex; gap: var(--s3); }
+    .cta-row .btn-primary,
+    .cta-row .btn-secondary { flex: 1; }
+
+    /* Share / Save */
+    .action-row {
+      display: flex; gap: var(--s3);
+      padding: var(--s3) var(--s5);
+    }
+    .action-btn {
+      flex: 1; padding: 10px var(--s3);
+      border: 1.5px solid var(--neutral-200);
+      border-radius: var(--r-xl);
+      background: var(--white);
+      font-size: 13px; font-weight: 700; color: var(--neutral-600);
+      display: flex; align-items: center; justify-content: center; gap: var(--s2);
+      transition: var(--t-fast);
+    }
+    .action-btn:hover { background: var(--primary-50); border-color: var(--primary-300); color: var(--primary-600); }
+
+    /* Highlight card */
+    .highlight-card {
+      margin: 0 var(--s5) var(--s3);
+      padding: var(--s4);
+      background: linear-gradient(135deg, var(--primary-50), #ebfeff);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--primary-100);
+    }
+    .highlight-title { font-size: 13px; font-weight: 700; color: var(--neutral-500); margin-bottom: var(--s2); }
+    .highlight-tips { display: flex; flex-direction: column; gap: var(--s2); }
+    .highlight-tip { display: flex; align-items: flex-start; gap: var(--s2); font-size: 13px; color: var(--neutral-600); }
+    .highlight-tip span { flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <!-- Generating overlay -->
+  <div class="gen-overlay" id="gen-overlay">
+    <div class="gen-logo">🗺️</div>
+    <div class="gen-title">Đang tạo kế hoạch...</div>
+    <div class="gen-sub" id="gen-sub-text">Xây dựng timeline chi tiết</div>
+    <div class="gen-bar-wrap"><div class="gen-bar" id="gen-bar"></div></div>
+  </div>
+
+  <div class="container" id="main-app" style="opacity:0">
+    <div class="page-wrapper" style="padding-bottom:100px">
+
+      <!-- Nav -->
+      <nav class="top-nav">
+        <a href="step5.html" class="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <span class="nav-title">Kế hoạch của bạn</span>
+        <span class="nav-step">6/6</span>
+      </nav>
+
+      <div class="scroll-content">
+        <!-- Hero -->
+        <div class="plan-hero">
+          <div class="plan-hero-orb"></div>
+          <div class="plan-hero-title" id="hero-title">Ninh Bình <em>3 ngày</em></div>
+          <div class="plan-hero-sub" id="hero-sub">Hành trình Thoải mái · Xe máy</div>
+          <div class="plan-hero-meta" id="hero-meta"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-val" id="stat-days">—</div>
+            <div class="stat-label">Ngày</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="stat-km">—</div>
+            <div class="stat-label">Km</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="stat-stops">—</div>
+            <div class="stat-label">Điểm dừng</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="stat-hours">—</div>
+            <div class="stat-label">Giờ đi</div>
+          </div>
+        </div>
+
+        <!-- Route Map -->
+        <div class="route-map" id="route-map">
+          <div class="route-map-title">🗺️ Sơ đồ hành trình</div>
+          <div class="route-path" id="route-path"></div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="action-row">
+          <button class="action-btn" onclick="shareTrip()"><span>📤</span> Chia sẻ</button>
+          <button class="action-btn" onclick="saveTrip()"><span>💾</span> Lưu</button>
+          <button class="action-btn" onclick="printTrip()"><span>🖨️</span> In</button>
+        </div>
+
+        <!-- Day Tabs -->
+        <div class="day-tabs" id="day-tabs"></div>
+
+        <!-- Timeline -->
+        <div id="timeline-container"></div>
+
+        <!-- Highlights -->
+        <div class="highlight-card" id="tips-card">
+          <div class="highlight-title">💡 Gợi ý cho chuyến đi</div>
+          <div class="highlight-tips" id="tips-list"></div>
+        </div>
+
+        <div style="height:80px"></div>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div class="bottom-cta">
+        <div class="cta-row">
+          <a href="index.html" class="btn-secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none">
+            🏠 Trang chủ
+          </a>
+          <button class="btn-primary" onclick="saveTrip()">
+            💾 Lưu chuyến đi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+
+    // Simulate generation
+    const genTexts = [
+      'Xây dựng timeline chi tiết...',
+      'Tính ETA từng chặng...',
+      'Gợi ý điểm nghỉ giải lao...',
+      'Kiểm tra phù hợp trẻ em...',
+      'Hoàn thiện kế hoạch ✨'
+    ];
+    const bar = document.getElementById('gen-bar');
+    const subText = document.getElementById('gen-sub-text');
+    let prog = 0;
+    const genInterval = setInterval(() => {
+      prog += 22;
+      bar.style.width = Math.min(prog, 100) + '%';
+      if (prog < 110) subText.textContent = genTexts[Math.min(Math.floor(prog/22), genTexts.length-1)];
+    }, 400);
+
+    setTimeout(() => {
+      clearInterval(genInterval);
+      bar.style.width = '100%';
+      setTimeout(() => {
+        document.getElementById('gen-overlay').style.opacity = '0';
+        document.getElementById('gen-overlay').style.transition = 'opacity .5s ease';
+        setTimeout(() => {
+          document.getElementById('gen-overlay').style.display = 'none';
+          const app = document.getElementById('main-app');
+          app.style.opacity = '1';
+          app.style.transition = 'opacity .5s ease';
+          buildPlan();
+        }, 500);
+      }, 300);
+    }, 2500);
+
+    // Time helpers
+    function addMinutes(hhmm, mins) {
+      const [h, m] = hhmm.split(':').map(Number);
+      const total = h * 60 + m + mins;
+      return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+    }
+
+    const VEHICLE_KMH = { 'xe-may': 45, 'oto': 70, 'tau': 60, 'may-bay': 200 };
+    const DEST_KM     = { 'Ninh Bình': 96, 'Huế': 658, 'Quảng Bình': 500, 'Nghệ An': 290, 'Hà Tĩnh': 340 };
+    const TIPS_DB = {
+      'Ninh Bình': ['🌿 Đi thuyền Tràng An nên đặt vé sớm, đặc biệt cuối tuần','⛰️ Hang Múa leo 500 bậc thang, mang giày thể thao','🚗 Nên đi xe máy để di chuyển linh hoạt giữa các điểm'],
+      'Huế': ['🏯 Đại Nội nên đi sáng sớm trước 9h để tránh nắng','🍜 Ăn thử bún bò Huế và cơm hến chính gốc','🛥️ Thuê xe đạp điện để khám phá các lăng tẩm'],
+      'default': ['💧 Mang đủ nước uống, đặc biệt mùa hè','🧴 Dùng kem chống nắng SPF 50+ cho ngày dài ngoài trời','📱 Tải bản đồ offline trước khi đi']
+    };
+
+    function getTips() {
+      const to = state.to || '';
+      for (const [k,v] of Object.entries(TIPS_DB)) {
+        if (k !== 'default' && to.toLowerCase().includes(k.toLowerCase())) return v;
+      }
+      return TIPS_DB.default;
+    }
+
+    function getKm() {
+      const to = state.to || '';
+      for (const [k,v] of Object.entries(DEST_KM)) {
+        if (to.toLowerCase().includes(k.toLowerCase())) return v;
+      }
+      return 150;
+    }
+
+    let activeDay = 1;
+
+    function buildPlan() {
+      const days   = state.days || 3;
+      const itinerary = state.itinerary || [];
+      const vehicle   = state.vehicle || 'xe-may';
+      const km = getKm();
+      const speed = VEHICLE_KMH[vehicle] || 50;
+      const driveHours = Math.round(km / speed * 10) / 10;
+
+      // Count total stops
+      let totalStops = 0;
+      itinerary.forEach(d => { totalStops += d.items.filter(i => !['Xuất phát','Về nhà','Ăn trưa'].some(x => i.name.includes(x))).length; });
+
+      // Hero
+      document.getElementById('hero-title').innerHTML = `${state.to || 'Ninh Bình'} <em>${days} ngày</em>`;
+      document.getElementById('hero-sub').textContent = `Hành trình ${
+        state.optionType === 'thoatmai' ? 'Thoải mái' :
+        state.optionType === 'khampha'  ? 'Khám phá' : 'Chill'
+      } · ${vehicle === 'xe-may' ? 'Xe máy' : vehicle === 'oto' ? 'Ô tô' : vehicle === 'tau' ? 'Tàu hỏa' : 'Máy bay'}`;
+
+      const chips = [
+        `✈️ ${state.from || 'Hà Nội'} → ${state.to || 'Ninh Bình'}`,
+        `👥 ${state.adults || 2} người lớn${state.children ? ` + ${state.children} trẻ em` : ''}`,
+      ];
+      document.getElementById('hero-meta').innerHTML = chips.map(c => `<span class="plan-hero-chip">${c}</span>`).join('');
+
+      // Stats
+      document.getElementById('stat-days').textContent  = days;
+      document.getElementById('stat-km').textContent    = km;
+      document.getElementById('stat-stops').textContent = totalStops || (days * 3);
+      document.getElementById('stat-hours').textContent = driveHours + 'h';
+
+      // Route path
+      const routePath = document.getElementById('route-path');
+      const mainStops = itinerary.length > 0
+        ? [{ icon:'📍', name: state.from || 'Hà Nội' }].concat(
+            itinerary.slice(0,3).map(d => {
+              const poi = d.items.find(i => !i.fixed && i.type !== 'Ăn uống' && i.type !== 'Lưu trú');
+              return { icon: poi?.icon || '📍', name: poi?.name || `Ngày ${d.dayNum}` };
+            })
+          ).concat([{ icon:'🏁', name: state.to || 'Ninh Bình' }])
+        : [
+            { icon:'📍', name: state.from || 'Hà Nội' },
+            { icon:'⛩️', name: 'Tràng An' },
+            { icon:'🏔️', name: 'Hang Múa' },
+            { icon:'🏁', name: state.to || 'Ninh Bình' },
+          ];
+
+      routePath.innerHTML = mainStops.map((s,i) => `
+        <div class="route-node">
+          <div class="route-node-dot ${i === 0 || i === mainStops.length-1 ? 'active' : ''}">
+            <span>${s.icon}</span>
+          </div>
+          <div class="route-node-label">${s.name}</div>
+        </div>
+        ${i < mainStops.length - 1 ? '<span class="route-arrow">→</span>' : ''}
+      `).join('');
+
+      // Day tabs
+      const tabsEl = document.getElementById('day-tabs');
+      tabsEl.innerHTML = '';
+      for (let d = 1; d <= days; d++) {
+        const tab = document.createElement('button');
+        tab.className = 'day-tab' + (d === 1 ? ' active' : '');
+        tab.textContent = `Ngày ${d}`;
+        tab.onclick = () => showDay(d);
+        tabsEl.appendChild(tab);
+      }
+
+      // Timeline
+      showDay(1);
+
+      // Tips
+      const tips = getTips();
+      document.getElementById('tips-list').innerHTML = tips.map(t => `
+        <div class="highlight-tip"><span>${t.slice(0,2)}</span><div>${t.slice(2).trim()}</div></div>
+      `).join('');
+    }
+
+    function showDay(dayNum) {
+      activeDay = dayNum;
+      document.querySelectorAll('.day-tab').forEach((t, i) => t.classList.toggle('active', i + 1 === dayNum));
+
+      const container = document.getElementById('timeline-container');
+      container.innerHTML = '';
+
+      const state2 = JSON.parse(sessionStorage.getItem('tripState') || '{}');
+      const itinerary = state2.itinerary || [];
+      const day = itinerary.find(d => d.dayNum === dayNum);
+
+      if (!day) {
+        // fallback demo
+        renderDemoDay(dayNum, container);
+        return;
+      }
+
+      // Header
+      const totalDayKm = Math.round(getKm() / (state2.days || 3));
+      container.innerHTML = `
+        <div class="timeline-day-header">
+          <div class="day-dot">${dayNum}</div>
+          <span class="day-label">Ngày ${dayNum} • ${new Date(Date.now() + (dayNum-1)*86400000).toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'numeric'})}</span>
+          <span class="day-km">${totalDayKm} km</span>
+        </div>
+      `;
+
+      const list = document.createElement('div');
+      list.className = 'timeline-list';
+
+      const DURATIONS = { 'Di tích - Thuyền':90,'Núi đá - Ngắm cảnh':60,'Sông - Thuyền':90,'Chùa - Tâm linh':45,'Rừng quốc gia':120,'Hang động':60,'Cố đô - Lịch sử':90,'Chùa - Tâm linh':45,'Đầm - Thiên nhiên':60,'Lăng tẩm - Lịch sử':75,'Chợ - Ẩm thực':45,'Đầm phá - Du thuyền':90,'Ăn uống':60,'Lưu trú':30 };
+      const DRIVE_BETWEEN = 30;
+
+      let currentTime = '07:30';
+
+      day.items.forEach(item => {
+        const dur = DURATIONS[item.type] || 45;
+        const dotType = item.type === 'Ăn uống' ? 'eat' : item.fixed ? 'start' : 'stop';
+
+        const row = document.createElement('div');
+        row.className = 'timeline-item fade-up';
+        row.innerHTML = `
+          <div class="tl-time">${currentTime}</div>
+          <div class="tl-dot-wrap">
+            <div class="tl-dot ${dotType}">${item.icon}</div>
+          </div>
+          <div class="tl-card">
+            <div class="tl-card-title">${item.name}</div>
+            <div class="tl-card-sub">${item.type}${dur ? ` · ~${dur} phút` : ''}</div>
+            ${buildTlTags(item)}
+          </div>
+        `;
+        list.appendChild(row);
+
+        currentTime = addMinutes(currentTime, dur + DRIVE_BETWEEN);
+      });
+
+      container.appendChild(list);
+    }
+
+    function buildTlTags(item) {
+      const tags = [];
+      if (item.name.includes('Tràng An') || item.name.includes('Hang Múa')) tags.push({ cls:'green', text:'✓ Phù hợp trẻ em' });
+      if (item.type === 'Ăn uống') tags.push({ cls:'orange', text:'🍜 Ăn uống' });
+      if (item.name.includes('biển') || item.name.includes('Biển')) tags.push({ cls:'blue', text:'🌊 Tắm biển' });
+      if (!tags.length) return '';
+      return `<div class="tl-card-tags">${tags.map(t => `<span class="tl-tag ${t.cls}">${t.text}</span>`).join('')}</div>`;
+    }
+
+    function renderDemoDay(dayNum, container) {
+      const demoItems = [
+        { time:'07:30', icon:'🚗', name:'Xuất phát', sub:'Khởi hành từ khách sạn', dot:'start', tags:'' },
+        { time:'09:00', icon:'⛩️', name:'Tràng An', sub:'Di tích - Thuyền · ~90 phút', dot:'stop', tags:'<div class="tl-card-tags"><span class="tl-tag green">✓ Phù hợp trẻ em</span></div>' },
+        { time:'11:00', icon:'🏔️', name:'Hang Múa', sub:'Núi đá - Leo bộ · ~60 phút', dot:'stop', tags:'' },
+        { time:'12:30', icon:'🍽️', name:'Ăn trưa', sub:'Cơm niêu Ninh Bình · ~60 phút', dot:'eat', tags:'<div class="tl-card-tags"><span class="tl-tag orange">🍜 Đặc sản địa phương</span></div>' },
+        { time:'14:00', icon:'🛕', name:'Chùa Bái Đính', sub:'Chùa - Tâm linh · ~45 phút', dot:'stop', tags:'' },
+        { time:'17:00', icon:'🏨', name:'Nhận phòng', sub:'Khách sạn - Nghỉ ngơi', dot:'start', tags:'' },
+      ];
+
+      const km = Math.round(getKm() / (state.days || 3));
+      container.innerHTML = `
+        <div class="timeline-day-header">
+          <div class="day-dot">${dayNum}</div>
+          <span class="day-label">Ngày ${dayNum}</span>
+          <span class="day-km">${km} km</span>
+        </div>
+      `;
+      const list = document.createElement('div');
+      list.className = 'timeline-list';
+      demoItems.forEach(it => {
+        const row = document.createElement('div');
+        row.className = 'timeline-item';
+        row.innerHTML = `
+          <div class="tl-time">${it.time}</div>
+          <div class="tl-dot-wrap"><div class="tl-dot ${it.dot}">${it.icon}</div></div>
+          <div class="tl-card">
+            <div class="tl-card-title">${it.name}</div>
+            <div class="tl-card-sub">${it.sub}</div>
+            ${it.tags}
+          </div>
+        `;
+        list.appendChild(row);
+      });
+      container.appendChild(list);
+    }
+
+    function addMinutes(hhmm, mins) {
+      const [h, m] = hhmm.split(':').map(Number);
+      const total  = h * 60 + m + mins;
+      return `${String(Math.floor(total/60) % 24).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+    }
+
+    function shareTrip() {
+      if (navigator.share) {
+        navigator.share({ title: 'Kế hoạch du lịch LữHành', text: `Hành trình ${state.days || 3} ngày đến ${state.to || 'Ninh Bình'}` });
+      } else {
+        alert('Link đã được copy vào clipboard! 🎉');
+      }
+    }
+
+    function saveTrip() {
+      const trips = JSON.parse(localStorage.getItem('savedTrips') || '[]');
+      trips.push({ ...state, savedAt: Date.now() });
+      localStorage.setItem('savedTrips', JSON.stringify(trips));
+      const btn = event.target;
+      btn.textContent = '✅ Đã lưu!';
+      setTimeout(() => btn.textContent = '💾 Lưu chuyến đi', 2000);
+    }
+
+    function printTrip() { window.print(); }
+  </script>
+</body>
+</html>

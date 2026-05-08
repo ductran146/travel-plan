@@ -21,57 +21,47 @@
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
     --shadow-lg: 0 8px 32px rgba(93,48,247,0.16);
+
+    /* Typography tokens – Pretendard */
+    --font-family: 'Pretendard', 'Noto Sans', sans-serif;
+
+    --fw-bold:     700;
+    --fw-semibold: 600;
+    --fw-medium:   500;
+    --fw-regular:  400;
+
+    --fs-display1: 56px; --lh-display1: 72px;
+    --fs-display2: 44px; --lh-display2: 56px;
+    --fs-header1:  36px; --lh-header1:  44px;
+    --fs-header2:  32px; --lh-header2:  40px;
+    --fs-header3:  28px; --lh-header3:  36px;
+    --fs-title1:   24px; --lh-title1:   32px;
+    --fs-title2:   20px; --lh-title2:   28px;
+    --fs-title3:   18px; --lh-title3:   26px;
+    --fs-body1:    17px; --lh-body1:    24px;
+    --fs-body2:    16px; --lh-body2:    24px;
+    --fs-body3:    15px; --lh-body3:    22px;
+    --fs-body4:    14px; --lh-body4:    20px;
+    --fs-label1:   13px; --lh-label1:   18px;
+    --fs-label2:   11px; --lh-label2:   16px;
+    --fs-label3:   11px; --lh-label3:   14px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Noto Sans', sans-serif;
+    font-family: var(--font-family);
     background: var(--bg);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* ──────────── STATUS BAR ──────────── */
-  .status-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 44px;
-    background: var(--primary);
-    z-index: 100;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: 0 20px 6px;
-    font-family: 'Sora', sans-serif;
-  }
-  .status-bar .time { font-size: 15px; font-weight: 600; color: white; }
-  .status-bar .icons { display: flex; gap: 6px; align-items: center; }
-  .status-bar .icons svg { width: 16px; height: 12px; fill: white; }
-  .battery-icon {
-    width: 25px; height: 13px;
-    border: 1.5px solid rgba(255,255,255,0.6);
-    border-radius: 3px;
-    padding: 2px;
-    position: relative;
-    display: flex; align-items: center;
-  }
-  .battery-icon::after {
-    content: '';
-    position: absolute; right: -5px; top: 50%;
-    transform: translateY(-50%);
-    width: 3px; height: 6px;
-    background: rgba(255,255,255,0.4);
-    border-radius: 1px;
-  }
-  .battery-fill { background: white; border-radius: 1px; flex: 1; height: 100%; }
-
   /* ──────────── HEADER HERO ──────────── */
   .hero {
     position: relative;
     background: var(--primary);
-    padding: 44px 0 0;
+    padding: 0;
     overflow: hidden;
   }
   .hero-glow1 {
@@ -90,25 +80,28 @@
   }
   .hero-content {
     position: relative; z-index: 2;
-    padding: 16px 20px 0;
+    padding: 20px 20px 0;
   }
   .hero-title {
-    font-family: 'Sora', sans-serif;
-    font-size: 11px; font-weight: 500;
+    font-family: var(--font-family);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    font-weight: var(--fw-medium);
     color: rgba(255,255,255,0.6);
     letter-spacing: 2px; text-transform: uppercase;
     margin-bottom: 4px;
   }
   .hero-name {
-    font-family: 'Sora', sans-serif;
-    font-size: 22px; font-weight: 700;
-    color: white; line-height: 1.2;
+    font-family: var(--font-family);
+    font-size: var(--fs-title2); line-height: var(--lh-title2);
+    font-weight: var(--fw-bold);
+    color: white;
   }
   .hero-meta {
     display: flex; gap: 16px; margin-top: 8px;
   }
   .hero-meta span {
-    font-size: 12px; color: rgba(255,255,255,0.7);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    color: rgba(255,255,255,0.7);
     display: flex; align-items: center; gap: 4px;
   }
   .hero-meta svg { width: 12px; height: 12px; fill: rgba(255,255,255,0.6); }
@@ -151,26 +144,15 @@
   }
   .stop-pin:hover { transform: translateY(-2px); }
   .pin-icon {
-    width: 22px; height: 22px;
-    background: var(--accent);
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    box-shadow: 0 2px 8px rgba(255,126,33,0.5);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: flex-end; justify-content: center;
     flex-shrink: 0;
-    transition: background 0.2s, box-shadow 0.2s;
+    filter: drop-shadow(0 2px 6px rgba(255,126,33,0.45));
+    transition: filter 0.2s;
   }
   .pin-icon.active-pin {
-    background: var(--primary);
-    box-shadow: 0 2px 12px rgba(93,48,247,0.6);
+    filter: drop-shadow(0 2px 8px rgba(93,48,247,0.55));
   }
-  .pin-icon::after {
-    content: '';
-    width: 7px; height: 7px;
-    background: white;
-    border-radius: 50%;
-    transform: rotate(45deg);
-  }
+  .pin-icon svg { display: block; }
   .pin-stem {
     width: 1px; height: 0px;
     background: rgba(255,255,255,0.6);
@@ -178,11 +160,11 @@
     transition: height 0.3s;
   }
   .pin-label {
-    font-family: 'Noto Sans', sans-serif;
-    font-size: 11px; font-weight: 500;
+    font-family: var(--font-family);
+    font-size: var(--fs-label2); line-height: var(--lh-label2);
+    font-weight: var(--fw-medium);
     color: white;
     text-align: center;
-    line-height: 1.3;
     max-width: 64px;
     white-space: normal;
     word-break: keep-all;
@@ -200,9 +182,10 @@
     padding: 3px 8px;
     display: flex; flex-direction: column;
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    font-size: 10px; font-weight: 400;
+    font-family: var(--font-family);
+    font-size: var(--fs-label2); line-height: var(--lh-label2);
+    font-weight: var(--fw-regular);
     color: var(--text-secondary);
-    line-height: 1.5;
     pointer-events: none;
   }
   /* Caret */
@@ -226,44 +209,63 @@
   /* ──────────── TAB BAR ──────────── */
   .tab-bar {
     background: white;
-    padding: 16px 20px;
-    display: flex; gap: 8px;
-    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+    gap: 8px;
     position: sticky;
-    top: 44px; z-index: 50;
+    top: 0; z-index: 50;
+    width: 100%;
+    height: 80px;
     box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  /* Active tab – dark fill */
   .tab-btn {
-    flex: 1;
-    padding: 8px 4px;
-    border-radius: 10px;
-    border: 1.5px solid var(--border);
-    background: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 4px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    border: none;
     cursor: pointer;
-    transition: all 0.22s cubic-bezier(.4,0,.2,1);
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+
+    /* Default = inactive (white bg) */
+    background: rgba(255,255,255,0.94);
+    box-sizing: border-box;
+    border: 1px solid rgba(17,24,39,0.08);
   }
-  .tab-btn .tab-day {
-    font-family: 'Sora', sans-serif;
-    font-size: 11px; font-weight: 600;
-    color: var(--text-muted);
-    transition: color 0.2s;
-  }
-  .tab-btn .tab-dest {
-    font-size: 10px; font-weight: 400;
-    color: var(--text-muted);
-    transition: color 0.2s;
+  .tab-btn .tab-label {
+    font-family: var(--font-family);
+    font-style: normal;
+    font-weight: var(--fw-regular);
+    font-size: var(--fs-body3);
+    line-height: var(--lh-body3);
+    display: flex;
+    align-items: center;
     text-align: center;
-    line-height: 1.2;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.2s, font-weight 0.2s;
   }
+  /* Active tab */
   .tab-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-1px);
+    background: rgba(17, 24, 39, 0.7);
+    border-color: transparent;
   }
-  .tab-btn.active .tab-day,
-  .tab-btn.active .tab-dest { color: white; }
+  .tab-btn.active .tab-label {
+    font-weight: var(--fw-semibold);
+    color: rgba(255, 255, 255, 0.94);
+  }
 
   /* ──────────── SCHEDULE SECTIONS ──────────── */
   .schedule-container {
@@ -287,16 +289,19 @@
     margin-bottom: 16px;
   }
   .day-summary-label {
-    font-family: 'Sora', sans-serif;
-    font-size: 18px; font-weight: 700;
+    font-family: var(--font-family);
+    font-size: var(--fs-title3); line-height: var(--lh-title3);
+    font-weight: var(--fw-bold);
     color: var(--text-primary);
   }
   .day-summary-route {
     display: flex; align-items: center; gap: 4px;
-    font-size: 14px; font-weight: 700;
+    font-family: var(--font-family);
+    font-size: var(--fs-body2); line-height: var(--lh-body2);
+    font-weight: var(--fw-bold);
     color: var(--text-primary);
   }
-  .day-summary-arrow { color: var(--text-muted); font-size: 12px; }
+  .day-summary-arrow { color: var(--text-muted); font-size: var(--fs-label1); }
   .day-stats {
     display: flex; gap: 6px; margin-top: 8px;
   }
@@ -304,7 +309,10 @@
     background: #F3F4F6;
     border-radius: 20px;
     padding: 3px 10px;
-    font-size: 12px; color: var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    font-weight: var(--fw-regular);
+    color: var(--text-secondary);
     display: flex; align-items: center; gap: 4px;
   }
   .day-stat svg { width: 11px; height: 11px; fill: var(--text-muted); }
@@ -325,10 +333,10 @@
     padding-top: 2px;
   }
   .tl-time {
-    font-family: 'Sora', sans-serif;
-    font-size: 13px; font-weight: 600;
+    font-family: var(--font-family);
+    font-size: var(--fs-body3); line-height: var(--lh-body3);
+    font-weight: var(--fw-medium);
     color: var(--text-primary);
-    line-height: 1;
     white-space: nowrap;
   }
   .tl-pin-dot {
@@ -358,17 +366,24 @@
     padding: 0 0 20px 12px;
   }
   .tl-title {
-    font-size: 14px; font-weight: 600;
+    font-family: var(--font-family);
+    font-size: var(--fs-body3); line-height: var(--lh-body3);
+    font-weight: var(--fw-semibold);
     color: var(--text-primary);
-    line-height: 1.3; margin-bottom: 2px;
+    margin-bottom: 2px;
   }
   .tl-sub {
-    font-size: 12px; color: var(--text-muted);
+    font-family: var(--font-family);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    font-weight: var(--fw-regular);
+    color: var(--text-muted);
     margin-bottom: 6px;
   }
   .tl-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
   .tl-tag {
-    font-size: 10px; font-weight: 500;
+    font-family: var(--font-family);
+    font-size: var(--fs-label2); line-height: var(--lh-label2);
+    font-weight: var(--fw-medium);
     padding: 2px 8px; border-radius: 20px;
     background: #EDE9FE; color: var(--primary);
   }
@@ -395,11 +410,23 @@
   }
   .tl-travel-icon svg { width: 14px; height: 14px; fill: white; }
   .tl-travel-info { flex: 1; }
-  .tl-travel-label { font-size: 13px; font-weight: 500; color: var(--text-primary); }
-  .tl-travel-meta { font-size: 11px; color: var(--text-muted); }
+  .tl-travel-label {
+    font-family: var(--font-family);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    font-weight: var(--fw-medium);
+    color: var(--text-primary);
+  }
+  .tl-travel-meta {
+    font-family: var(--font-family);
+    font-size: var(--fs-label2); line-height: var(--lh-label2);
+    font-weight: var(--fw-regular);
+    color: var(--text-muted);
+  }
   .tl-travel-dist {
-    font-family: 'Sora', sans-serif;
-    font-size: 12px; font-weight: 700; color: var(--primary);
+    font-family: var(--font-family);
+    font-size: var(--fs-label1); line-height: var(--lh-label1);
+    font-weight: var(--fw-bold);
+    color: var(--primary);
     background: #EDE9FE;
     padding: 2px 8px; border-radius: 20px;
   }
@@ -426,22 +453,12 @@
   }
   @media (min-width: 481px) {
     body { max-width: 420px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
-    .status-bar, .tab-bar { max-width: 420px; }
+    .tab-bar { max-width: 420px; }
     .fab { right: calc(50% - 210px + 20px); }
   }
 </style>
 </head>
 <body>
-
-<!-- STATUS BAR -->
-<div class="status-bar">
-  <span class="time">9:41</span>
-  <div class="icons">
-    <svg viewBox="0 0 20 12"><rect x="0" y="2" width="4" height="10" rx="1"/><rect x="5.5" y="0" width="4" height="12" rx="1" opacity=".4"/><rect x="11" y="0" width="4" height="12" rx="1" opacity=".4"/><rect x="16.5" y="0" width="3.5" height="12" rx="1" opacity=".4"/></svg>
-    <svg viewBox="0 0 18 14"><path d="M9 2.5C11.8 2.5 14.3 3.7 16 5.7L17.5 4C15.4 1.5 12.4 0 9 0 5.6 0 2.6 1.5.5 4L2 5.7C3.7 3.7 6.2 2.5 9 2.5z"/><path d="M9 7.5C10.9 7.5 12.6 8.3 13.8 9.6L15.3 7.9C13.7 6.1 11.5 5 9 5s-4.7 1.1-6.3 2.9L4.2 9.6C5.4 8.3 7.1 7.5 9 7.5z"/><circle cx="9" cy="12" r="2"/></svg>
-    <div class="battery-icon"><div class="battery-fill"></div></div>
-  </div>
-</div>
 
 <!-- HERO + ROUTE -->
 <div class="hero" id="hero">
@@ -519,55 +536,55 @@
       <!-- STOP PINS (left position = x on path, top = below curve) -->
       <!-- 0: Từ Sơn (xuất phát) -->
       <div class="stop-pin active-stop" style="left:8px; top:50px;" data-day="1">
-        <div class="pin-icon active-pin"></div>
+        <span class="pin-icon active-pin"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#5D30F7"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:32px;"></div>
         <div class="pin-label">Từ Sơn</div>
       </div>
       <!-- 1: Làng Sen Quê Bác -->
       <div class="stop-pin" style="left:205px; top:22px;" data-day="1">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:40px;"></div>
         <div class="pin-label">Làng Sen Quê Bác</div>
       </div>
       <!-- 2: Cửa Lò (check-in) -->
       <div class="stop-pin" style="left:340px; top:36px;" data-day="1">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:52px;"></div>
         <div class="pin-label">Cửa Lò</div>
       </div>
       <!-- 3: Đền thờ vua Quang Trung -->
       <div class="stop-pin" style="left:535px; top:44px;" data-day="2">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:30px;"></div>
         <div class="pin-label">Đền Vua Quang Trung</div>
       </div>
       <!-- 4: Vin Wonder -->
       <div class="stop-pin" style="left:680px; top:32px;" data-day="2">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:40px;"></div>
         <div class="pin-label">Vin Wonder</div>
       </div>
       <!-- 5: Cửa Lò (back) -->
       <div class="stop-pin" style="left:728px; top:34px;" data-day="2">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:52px;"></div>
         <div class="pin-label">Cửa Lò</div>
       </div>
       <!-- 6: Ngã Ba Đồng Lộc -->
       <div class="stop-pin" style="left:958px; top:30px;" data-day="3">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:40px;"></div>
         <div class="pin-label">Ngã Ba Đồng Lộc</div>
       </div>
       <!-- 7: Thiên Cầm -->
       <div class="stop-pin" style="left:1125px; top:46px;" data-day="3">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:28px;"></div>
         <div class="pin-label">Thiên Cầm</div>
       </div>
       <!-- 8: Từ Sơn (về) -->
       <div class="stop-pin" style="left:1516px; top:36px;" data-day="4">
-        <div class="pin-icon"></div>
+        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
         <div class="pin-stem" style="height:44px;"></div>
         <div class="pin-label">Từ Sơn</div>
       </div>
@@ -582,20 +599,16 @@
 <!-- TAB BAR -->
 <div class="tab-bar" id="tabBar">
   <button class="tab-btn active" data-day="1" onclick="switchDay(1)">
-    <span class="tab-day">Ngày 1</span>
-    <span class="tab-dest">Từ Sơn → Cửa Lò</span>
+    <span class="tab-label">Ngày 1</span>
   </button>
   <button class="tab-btn" data-day="2" onclick="switchDay(2)">
-    <span class="tab-day">Ngày 2</span>
-    <span class="tab-dest">Khám phá Nghệ An</span>
+    <span class="tab-label">Ngày 2</span>
   </button>
   <button class="tab-btn" data-day="3" onclick="switchDay(3)">
-    <span class="tab-day">Ngày 3</span>
-    <span class="tab-dest">Đồng Lộc · Thiên Cầm</span>
+    <span class="tab-label">Ngày 3</span>
   </button>
   <button class="tab-btn" data-day="4" onclick="switchDay(4)">
-    <span class="tab-day">Ngày 4</span>
-    <span class="tab-dest">Về Từ Sơn</span>
+    <span class="tab-label">Ngày 4</span>
   </button>
 </div>
 
@@ -1201,9 +1214,17 @@
     // Update pin highlights
     document.querySelectorAll('.pin-icon').forEach(pin => {
       pin.classList.remove('active-pin');
+      // Restore orange fill
+      const mainPath = pin.querySelector('path:first-child');
+      if (mainPath) mainPath.setAttribute('fill', '#FF7E21');
     });
     document.querySelectorAll('.stop-pin[data-day="' + day + '"]').forEach(pin => {
-      pin.querySelector('.pin-icon').classList.add('active-pin');
+      const icon = pin.querySelector('.pin-icon');
+      if (icon) {
+        icon.classList.add('active-pin');
+        const mainPath = icon.querySelector('path:first-child');
+        if (mainPath) mainPath.setAttribute('fill', '#5D30F7');
+      }
     });
 
     // Scroll route if triggered by tab click

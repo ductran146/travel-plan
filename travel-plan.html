@@ -133,6 +133,7 @@
     top: 36px; left: 0;
     width: 100%; height: 80px;
     pointer-events: none;
+    overflow: visible;
   }
 
   /* Stop pin */
@@ -281,6 +282,10 @@
   @keyframes fadeSlideIn {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes flowDash {
+    to { stroke-dashoffset: -32; }
   }
 
   /* Summary row */
@@ -465,7 +470,6 @@
   <div class="hero-glow1"></div>
   <div class="hero-glow2"></div>
   <div class="hero-content">
-    <div class="hero-title">Lịch trình du lịch</div>
     <div class="hero-name">Hành Trình Nghệ An 4 Ngày</div>
     <div class="hero-meta">
       <span>
@@ -485,18 +489,66 @@
 
       <!-- SVG PATH -->
       <svg class="route-svg" viewBox="0 0 1600 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- White glow border -->
-        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <!-- Dashed dark line -->
-        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52" stroke="#424754" stroke-width="1.5" stroke-dasharray="6,4" fill="none" stroke-linecap="round"/>
-        <!-- Day 1 segment highlight -->
-        <path id="dayPath1" d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50" stroke="#FF7E21" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
-        <!-- Day 2 segment highlight -->
-        <path id="dayPath2" d="M355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48" stroke="#F730B6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
-        <!-- Day 3 segment highlight -->
-        <path id="dayPath3" d="M740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60" stroke="#5D30F7" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
-        <!-- Day 4 segment highlight -->
-        <path id="dayPath4" d="M1135,60 C1200,64 1300,30 1532,52" stroke="#059669" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
+        <defs>
+          <style>
+            @keyframes flowDash {
+              to { stroke-dashoffset: -32; }
+            }
+            @keyframes flowDashDay2 {
+              to { stroke-dashoffset: -32; }
+            }
+            @keyframes flowDashDay3 {
+              to { stroke-dashoffset: -32; }
+            }
+            @keyframes flowDashDay4 {
+              to { stroke-dashoffset: -32; }
+            }
+            .flow-active {
+              stroke-dasharray: 16 16;
+              animation: flowDash 0.65s linear infinite;
+            }
+          </style>
+        </defs>
+
+        <!-- Layer 1: wide white glow road base -->
+        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
+              stroke="rgba(255,255,255,0.18)" stroke-width="12" fill="none" stroke-linecap="round"/>
+
+        <!-- Layer 2: solid white road surface -->
+        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
+              stroke="rgba(255,255,255,0.92)" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+        <!-- Layer 3: dark dashed center line (static road markings) -->
+        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
+              stroke="rgba(66,71,84,0.35)" stroke-width="1.5" stroke-dasharray="6,4" fill="none" stroke-linecap="round"/>
+
+        <!-- Layer 4: FLOWING colored dash – Day 1 segment (orange) -->
+        <path id="dayPath1"
+              d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50"
+              stroke="#FF7E21" stroke-width="3" fill="none" stroke-linecap="round"
+              stroke-dasharray="16 16"
+              style="animation: flowDash 0.65s linear infinite; opacity:1"/>
+
+        <!-- Layer 4: FLOWING colored dash – Day 2 segment (pink) -->
+        <path id="dayPath2"
+              d="M355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48"
+              stroke="#F730B6" stroke-width="3" fill="none" stroke-linecap="round"
+              stroke-dasharray="16 16"
+              style="animation: flowDash 0.65s linear infinite; opacity:0"/>
+
+        <!-- Layer 4: FLOWING colored dash – Day 3 segment (purple) -->
+        <path id="dayPath3"
+              d="M740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60"
+              stroke="#5D30F7" stroke-width="3" fill="none" stroke-linecap="round"
+              stroke-dasharray="16 16"
+              style="animation: flowDash 0.65s linear infinite; opacity:0"/>
+
+        <!-- Layer 4: FLOWING colored dash – Day 4 segment (green) -->
+        <path id="dayPath4"
+              d="M1135,60 C1200,64 1300,30 1532,52"
+              stroke="#059669" stroke-width="3" fill="none" stroke-linecap="round"
+              stroke-dasharray="16 16"
+              style="animation: flowDash 0.65s linear infinite; opacity:0"/>
       </svg>
 
       <!-- DISTANCE BADGES -->
@@ -1205,10 +1257,13 @@
     });
     document.getElementById('day' + day).classList.add('active');
 
-    // Update route highlights
+    // Update route highlights – keep animation running, just fade opacity
     [1,2,3,4].forEach(d => {
       const path = document.getElementById('dayPath' + d);
-      if (path) path.style.opacity = DAY_CONFIG[day].pathOpacities[d-1];
+      if (path) {
+        path.style.transition = 'opacity 0.4s ease';
+        path.style.opacity = (d === day) ? '1' : '0';
+      }
     });
 
     // Update pin highlights

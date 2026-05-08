@@ -64,32 +64,17 @@
     top: 0;
     z-index: 60;
     background: var(--primary);
-    height: 200px;
+    height: 260px;
     overflow: hidden;
     flex-shrink: 0;
-  }
-  .hero-glow1 {
-    position: absolute; width: 240px; height: 240px;
-    right: -40px; top: -40px;
-    background: rgba(247, 48, 182, 0.25);
-    filter: blur(60px); border-radius: 50%;
-    pointer-events: none;
-  }
-  .hero-glow2 {
-    position: absolute; width: 240px; height: 240px;
-    left: -60px; bottom: 20px;
-    background: rgba(255, 126, 33, 0.25);
-    filter: blur(60px); border-radius: 50%;
-    pointer-events: none;
   }
 
   /* ──────────── ROUTE STRIP ──────────── */
   .route-wrapper {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    inset: 0;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 20px 20px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     cursor: grab;
@@ -98,90 +83,73 @@
   .route-wrapper::-webkit-scrollbar { display: none; }
   .route-wrapper.grabbing { cursor: grabbing; }
 
+  /* Canvas: all route elements live here */
   .route-track {
     position: relative;
     width: 1600px;
-    height: 200px;
+    height: 260px;
     flex-shrink: 0;
   }
 
-  /* Path SVG */
+  /* Full-canvas SVG — draws road, stems, dots all together */
   .route-svg {
     position: absolute;
-    top: 55px; left: 0;
-    width: 100%; height: 90px;
+    top: 0; left: 0;
+    width: 1600px; height: 260px;
     pointer-events: none;
     overflow: visible;
   }
 
-  /* Stop pin */
+  /* PIN ICON: absolutely positioned, pointer-events on */
   .stop-pin {
     position: absolute;
-    display: flex; flex-direction: column; align-items: center;
+    width: 24px; height: 24px;
     cursor: pointer;
     transition: transform 0.2s;
+    z-index: 2;
   }
-  .stop-pin:hover { transform: translateY(-2px); }
-  .pin-icon {
-    display: flex; align-items: flex-end; justify-content: center;
-    flex-shrink: 0;
-    filter: drop-shadow(0 2px 6px rgba(255,126,33,0.45));
-    transition: filter 0.2s;
-  }
-  .pin-icon.active-pin {
-    filter: drop-shadow(0 2px 8px rgba(93,48,247,0.55));
-  }
-  .pin-icon svg { display: block; }
-  .pin-stem {
-    width: 0;
-    border-left: 1.5px dashed rgba(255,255,255,0.6);
-    flex-shrink: 0;
-  }
+  .stop-pin:hover { transform: translateY(-2px) scale(1.1); }
+  .stop-pin svg { display: block; width: 24px; height: 24px; }
+  .stop-pin.active-day svg path:first-child { fill: #5D30F7; }
+
+  /* PLACE LABEL: absolutely positioned below road */
   .pin-label {
+    position: absolute;
     font-family: var(--font-family);
-    font-size: var(--fs-label2); line-height: var(--lh-label2);
-    font-weight: var(--fw-medium);
-    color: white;
+    font-size: 11px; line-height: 15px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.92);
     text-align: center;
-    max-width: 64px;
-    white-space: normal;
-    word-break: keep-all;
-    hyphens: none;
-    margin-top: 3px;
-    opacity: 0.9;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+    transform: translateX(-50%);
   }
 
-  /* Distance badge */
+  /* DISTANCE BADGE: absolutely positioned above road */
   .dist-badge {
     position: absolute;
-    top: 0;
-    background: rgba(255,255,255,0.96);
-    border-radius: 8px;
-    padding: 3px 8px;
-    display: flex; flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    font-family: var(--font-family);
-    font-size: var(--fs-label2); line-height: var(--lh-label2);
-    font-weight: var(--fw-regular);
-    color: var(--text-secondary);
+    background: rgba(255,255,255,0.99);
+    border-radius: 10px;
+    padding: 4px 10px;
+    display: flex; flex-direction: column; align-items: flex-start;
     pointer-events: none;
+    font-family: var(--font-family);
+    font-size: 11px; line-height: 16px;
+    font-weight: 400;
+    color: #4B5563;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    z-index: 3;
+    transform: translateX(-50%);
   }
-  /* Caret */
   .dist-badge::after {
     content: '';
     position: absolute;
-    bottom: -5px; left: 50%; transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: rgba(255,255,255,0.96);
+    bottom: -6px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(255,255,255,0.99);
     border-bottom: 0;
-  }
-
-  /* Day highlight indicator */
-  .day-indicator {
-    position: absolute; bottom: 0;
-    height: 3px; border-radius: 2px;
-    transition: all 0.4s cubic-bezier(.4,0,.2,1);
-    pointer-events: none;
   }
 
   /* ──────────── TAB BAR ──────────── */
@@ -193,7 +161,7 @@
     padding: 20px;
     gap: 8px;
     position: sticky;
-    top: 200px; z-index: 50;
+    top: 260px; z-index: 50;
     width: 100%;
     height: 80px;
     box-shadow: var(--shadow-sm);
@@ -430,9 +398,7 @@
   .fab svg { width: 18px; height: 18px; fill: white; }
 
   /* ──────────── MOBILE CONSTRAINT ──────────── */
-  @media (max-width: 480px) {
-    .hero-name { font-size: 18px; }
-  }
+  @media (max-width: 480px) { }
   @media (min-width: 481px) {
     body { max-width: 420px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
     .tab-bar { max-width: 420px; }
@@ -444,164 +410,92 @@
 
 <!-- HERO ROUTE (sticky) -->
 <div class="hero" id="hero">
-  <div class="hero-glow1"></div>
-  <div class="hero-glow2"></div>
-
-  <!-- ROUTE SCROLLABLE -->
   <div class="route-wrapper" id="routeWrapper">
     <div class="route-track" id="routeTrack">
 
-      <!-- SVG PATH – road path centered ~y=80 in 200px hero -->
-      <svg class="route-svg" viewBox="0 0 1600 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <style>
-            @keyframes flowDash { to { stroke-dashoffset: -32; } }
-          </style>
-        </defs>
+      <svg class="route-svg" viewBox="0 0 1600 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><style>@keyframes flowDash{to{stroke-dashoffset:-32}}</style></defs>
 
-        <!-- Layer 1: wide soft glow base -->
-        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
-              stroke="rgba(255,255,255,0.18)" stroke-width="18" fill="none" stroke-linecap="round"/>
+        <!-- Glow halo -->
+        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
+              stroke="rgba(255,255,255,0.18)" stroke-width="22" fill="none" stroke-linecap="round"/>
 
-        <!-- Layer 2: solid white road surface (+6px → 11px) -->
-        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
-              stroke="rgba(255,255,255,0.92)" stroke-width="11" fill="none" stroke-linecap="round"/>
+        <!-- Solid white road -->
+        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
+              stroke="rgba(255,255,255,0.95)" stroke-width="11" fill="none" stroke-linecap="round"/>
 
-        <!-- Layer 3: static dashed center line -->
-        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52"
-              stroke="rgba(66,71,84,0.35)" stroke-width="1.5" stroke-dasharray="6,4" fill="none" stroke-linecap="round"/>
-
-        <!-- Layer 4: FLOWING dash – Day 1 (orange) -->
-        <path id="dayPath1"
-              d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50"
+        <!-- Day 1 dash (orange) -->
+        <path id="dayPath1" d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122"
               stroke="#FF7E21" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16"
-              style="animation:flowDash 0.65s linear infinite; opacity:1; transition:opacity 0.4s ease"/>
-
-        <!-- Layer 4: FLOWING dash – Day 2 (pink) -->
-        <path id="dayPath2"
-              d="M355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48"
+              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:1;transition:opacity 0.35s ease"/>
+        <!-- Day 2 dash (pink) -->
+        <path id="dayPath2" d="M355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120"
               stroke="#F730B6" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16"
-              style="animation:flowDash 0.65s linear infinite; opacity:0; transition:opacity 0.4s ease"/>
-
-        <!-- Layer 4: FLOWING dash – Day 3 (purple) -->
-        <path id="dayPath3"
-              d="M740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60"
+              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+        <!-- Day 3 dash (purple) -->
+        <path id="dayPath3" d="M752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132"
               stroke="#5D30F7" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16"
-              style="animation:flowDash 0.65s linear infinite; opacity:0; transition:opacity 0.4s ease"/>
-
-        <!-- Layer 4: FLOWING dash – Day 4 (green) -->
-        <path id="dayPath4"
-              d="M1135,60 C1200,64 1300,30 1532,52"
+              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+        <!-- Day 4 dash (green) -->
+        <path id="dayPath4" d="M1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
               stroke="#059669" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16"
-              style="animation:flowDash 0.65s linear infinite; opacity:0; transition:opacity 0.4s ease"/>
+              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+
+        <!-- Stems + road dots (drawn in SVG so they sit exactly on path) -->
+        <line x1="20" y1="118" x2="20" y2="140" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="20" cy="140" r="4" fill="#5D30F7" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="229" y1="86" x2="229" y2="108" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="229" cy="108" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="355" y1="100" x2="355" y2="122" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="355" cy="122" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="562" y1="108" x2="562" y2="130" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="562" cy="130" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="703" y1="96" x2="703" y2="118" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="703" cy="118" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="752" y1="98" x2="752" y2="120" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="752" cy="120" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="982" y1="94" x2="982" y2="116" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="982" cy="116" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="1147" y1="110" x2="1147" y2="132" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="1147" cy="132" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <line x1="1532" y1="102" x2="1532" y2="124" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="1532" cy="124" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
       </svg>
 
-      <!-- DISTANCE BADGES -->
-      <!-- Day1: Từ Sơn → Làng Sen 312km -->
-      <div class="dist-badge" style="left:80px; top:0px; min-width:72px;">
-        <span>312 km</span><span>5 giờ 50 ph</span>
-      </div>
-      <!-- Làng Sen → Cửa Lò 27km -->
-      <div class="dist-badge" style="left:258px; top:20px; min-width:56px;">
-        <span>27 km</span><span>40 phút</span>
-      </div>
-      <!-- Day2: Cửa Lò → Đền QT 22km -->
-      <div class="dist-badge" style="left:408px; top:4px; min-width:56px;">
-        <span>22 km</span><span>32 phút</span>
-      </div>
-      <!-- Đền QT → Vin Wonder 22km -->
-      <div class="dist-badge" style="left:568px; top:10px; min-width:56px;">
-        <span>22 km</span><span>32 phút</span>
-      </div>
-      <!-- Vin → Cửa Lò 1km -->
-      <div class="dist-badge" style="left:672px; top:12px; min-width:48px;">
-        <span>1 km</span><span>10 phút</span>
-      </div>
-      <!-- Day3: Cửa Lò → Ngã Ba 58km -->
-      <div class="dist-badge" style="left:822px; top:12px; min-width:72px;">
-        <span>58 km</span><span>1 giờ 10 ph</span>
-      </div>
-      <!-- Ngã Ba → Thiên Cầm 47km -->
-      <div class="dist-badge" style="left:1000px; top:4px; min-width:72px;">
-        <span>47 km</span><span>1 giờ 7 ph</span>
-      </div>
-      <!-- Day4: Thiên Cầm → Từ Sơn 390km -->
-      <div class="dist-badge" style="left:1300px; top:0px; min-width:72px;">
-        <span>390 km</span><span>6 giờ 14 ph</span>
-      </div>
+      <!-- PIN ICONS (absolutely positioned, centered on stop x) -->
+      <div class="stop-pin active-day" style="left:8px;top:94px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#5D30F7"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:217px;top:62px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:343px;top:76px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:550px;top:84px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:691px;top:72px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:740px;top:74px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:970px;top:70px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:1135px;top:86px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:1520px;top:78px" data-day="4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
 
-      <!-- STOP PINS – stems stop exactly at road surface -->
-      <!-- road-svg top=55px; road dot y in SVG coords → screen: 55+y_coord -->
+      <!-- PLACE LABELS (below road) -->
+      <div class="pin-label" style="left:20px;top:152px">Từ Sơn</div>
+      <div class="pin-label" style="left:229px;top:120px">Làng Sen Quê Bác</div>
+      <div class="pin-label" style="left:355px;top:134px">Cửa Lò</div>
+      <div class="pin-label" style="left:562px;top:142px">Đền thờ vua Quang Trung</div>
+      <div class="pin-label" style="left:703px;top:130px">Vin Wonder</div>
+      <div class="pin-label" style="left:752px;top:132px">Cửa Lò</div>
+      <div class="pin-label" style="left:982px;top:128px">Ngã Ba Đồng Lộc</div>
+      <div class="pin-label" style="left:1147px;top:144px">Thiên Cầm</div>
+      <div class="pin-label" style="left:1532px;top:136px">Từ Sơn</div>
 
-      <!-- 0: Từ Sơn | road y=55+62=117 | pin top=50 | stem=117-50-24=43px -->
-      <div class="stop-pin active-stop" style="left:8px; top:50px;" data-day="1">
-        <span class="pin-icon active-pin"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#5D30F7"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:43px;"></div>
-        <div class="pin-label">Từ Sơn</div>
-      </div>
+      <!-- DISTANCE BADGES (above road, between pins) -->
+      <div class="dist-badge" style="left:124px;top:76px"><span>312 km</span><span>5 giờ 50 phút</span></div>
+      <div class="dist-badge" style="left:292px;top:67px"><span>27 km</span><span>40 phút</span></div>
+      <div class="dist-badge" style="left:458px;top:78px"><span>22 km</span><span>32 phút</span></div>
+      <div class="dist-badge" style="left:632px;top:76px"><span>22 km</span><span>32 phút</span></div>
+      <div class="dist-badge" style="left:727px;top:71px"><span>1 km</span><span>10 phút</span></div>
+      <div class="dist-badge" style="left:867px;top:70px"><span>58 km</span><span>1 giờ 10 phút</span></div>
+      <div class="dist-badge" style="left:1064px;top:76px"><span>47 km</span><span>1 giờ 7 phút</span></div>
+      <div class="dist-badge" style="left:1339px;top:80px"><span>390 km</span><span>6 giờ 14 phút</span></div>
 
-      <!-- 1: Làng Sen | road y=55+38=93 | pin top=18 | stem=93-18-24=51px -->
-      <div class="stop-pin" style="left:205px; top:18px;" data-day="1">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Làng Sen Quê Bác</div>
-      </div>
-
-      <!-- 2: Cửa Lò (ngày 1) | road y=55+50=105 | pin top=30 | stem=105-30-24=51px -->
-      <div class="stop-pin" style="left:340px; top:30px;" data-day="1">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Cửa Lò</div>
-      </div>
-
-      <!-- 3: Đền Quang Trung | road y=55+58=113 | pin top=38 | stem=113-38-24=51px -->
-      <div class="stop-pin" style="left:535px; top:38px;" data-day="2">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Đền Vua Quang Trung</div>
-      </div>
-
-      <!-- 4: Vin Wonder | road y=55+46=101 | pin top=26 | stem=101-26-24=51px -->
-      <div class="stop-pin" style="left:680px; top:26px;" data-day="2">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Vin Wonder</div>
-      </div>
-
-      <!-- 5: Cửa Lò (ngày 2) | road y=55+48=103 | pin top=28 | stem=103-28-24=51px -->
-      <div class="stop-pin" style="left:728px; top:28px;" data-day="2">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Cửa Lò</div>
-      </div>
-
-      <!-- 6: Ngã Ba Đồng Lộc | road y=55+44=99 | pin top=24 | stem=99-24-24=51px -->
-      <div class="stop-pin" style="left:958px; top:24px;" data-day="3">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Ngã Ba Đồng Lộc</div>
-      </div>
-
-      <!-- 7: Thiên Cầm | road y=55+60=115 | pin top=40 | stem=115-40-24=51px -->
-      <div class="stop-pin" style="left:1125px; top:40px;" data-day="3">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Thiên Cầm</div>
-      </div>
-
-      <!-- 8: Từ Sơn (về) | road y=55+52=107 | pin top=32 | stem=107-32-24=51px -->
-      <div class="stop-pin" style="left:1516px; top:32px;" data-day="4">
-        <span class="pin-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.5689C14.4189 22.1932 16.7748 19.7203 18.8633 17.622C22.8428 13.6217 23.1143 6.79483 19.0861 2.84464C17.1507 0.946822 14.6333 -0.00139085 12.1145 1.53121e-06C9.59703 1.53121e-06 7.0796 0.946822 5.14419 2.84464C1.11324 6.79623 1.38615 13.6231 5.36697 17.6234C7.45555 19.7217 9.81564 22.1946 11.1175 23.5703C11.6605 24.1439 12.5726 24.1425 13.1156 23.5703L13.117 23.5689Z" fill="#FF7E21"/><path d="M12.1159 12.9116C13.7485 12.9116 15.072 11.5881 15.072 9.95557C15.072 8.323 13.7485 6.99954 12.1159 6.99954C10.4834 6.99954 9.15991 8.323 9.15991 9.95557C9.15991 11.5881 10.4834 12.9116 12.1159 12.9116Z" fill="#FBFBFB"/></svg></span>
-        <div class="pin-stem" style="height:51px;"></div>
-        <div class="pin-label">Từ Sơn</div>
-      </div>
-
-    </div><!-- /route-track -->
-  </div><!-- /route-wrapper -->
+    </div>
+  </div>
 </div><!-- /hero -->
 
 <!-- TAB BAR -->
@@ -1222,21 +1116,34 @@
       }
     });
 
-    // Update pin highlights
-    document.querySelectorAll('.pin-icon').forEach(pin => {
-      pin.classList.remove('active-pin');
-      // Restore orange fill
+    // Update pin highlights — SVG is direct child of .stop-pin
+    document.querySelectorAll('.stop-pin').forEach(pin => {
+      pin.classList.remove('active-day');
       const mainPath = pin.querySelector('path:first-child');
       if (mainPath) mainPath.setAttribute('fill', '#FF7E21');
+      // also reset dot in SVG canvas
+    });
+    // SVG road dots: all reset to orange, active day → purple
+    document.querySelectorAll('.route-svg circle').forEach(c => {
+      c.setAttribute('fill', '#FF7E21');
     });
     document.querySelectorAll('.stop-pin[data-day="' + day + '"]').forEach(pin => {
-      const icon = pin.querySelector('.pin-icon');
-      if (icon) {
-        icon.classList.add('active-pin');
-        const mainPath = icon.querySelector('path:first-child');
-        if (mainPath) mainPath.setAttribute('fill', '#5D30F7');
-      }
+      pin.classList.add('active-day');
+      const mainPath = pin.querySelector('path:first-child');
+      if (mainPath) mainPath.setAttribute('fill', '#5D30F7');
     });
+    // Color the SVG dots for the active day's stops
+    const dayPins = document.querySelectorAll('.stop-pin[data-day="' + day + '"]');
+    if (dayPins.length > 0) {
+      // Find matching circles by index in route-track
+      const allPins = Array.from(document.querySelectorAll('.stop-pin'));
+      const allCircles = Array.from(document.querySelectorAll('.route-svg circle'));
+      allPins.forEach((pin, i) => {
+        if (+pin.dataset.day === day && allCircles[i]) {
+          allCircles[i].setAttribute('fill', '#5D30F7');
+        }
+      });
+    }
 
     // Scroll route if triggered by tab click
     if (!fromScroll) {

@@ -100,33 +100,33 @@
     overflow: visible;
   }
 
-  /* PIN ICON: absolutely positioned, pointer-events on */
+  /* PIN ICON: z-index 10 so it always shows above SVG road/dots */
   .stop-pin {
     position: absolute;
     width: 24px; height: 24px;
     cursor: pointer;
     transition: transform 0.2s;
-    z-index: 2;
+    z-index: 10;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
   }
-  .stop-pin:hover { transform: translateY(-2px) scale(1.1); }
+  .stop-pin:hover { transform: translateY(-3px) scale(1.1); }
   .stop-pin svg { display: block; width: 24px; height: 24px; }
-  .stop-pin.active-day svg path:first-child { fill: #5D30F7; }
 
-  /* PLACE LABEL: absolutely positioned below road */
+  /* PLACE LABEL: below road, z-index 5 */
   .pin-label {
     position: absolute;
     font-family: var(--font-family);
     font-size: 11px; line-height: 15px;
     font-weight: 500;
-    color: rgba(255,255,255,0.92);
+    color: rgba(255,255,255,0.95);
     text-align: center;
     white-space: nowrap;
     pointer-events: none;
-    z-index: 1;
+    z-index: 5;
     transform: translateX(-50%);
   }
 
-  /* DISTANCE BADGE: absolutely positioned above road */
+  /* DISTANCE BADGE: z-index 8, pushed HIGH above road so it never overlaps */
   .dist-badge {
     position: absolute;
     background: rgba(255,255,255,0.99);
@@ -139,8 +139,8 @@
     font-weight: 400;
     color: #4B5563;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+    z-index: 8;
     transform: translateX(-50%);
   }
   .dist-badge::after {
@@ -413,86 +413,68 @@
   <div class="route-wrapper" id="routeWrapper">
     <div class="route-track" id="routeTrack">
 
+      <!-- FULL-CANVAS SVG: road, stems, dots -->
       <svg class="route-svg" viewBox="0 0 1600 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <defs><style>@keyframes flowDash{to{stroke-dashoffset:-32}}</style></defs>
-
-        <!-- Glow halo -->
-        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
-              stroke="rgba(255,255,255,0.18)" stroke-width="22" fill="none" stroke-linecap="round"/>
-
-        <!-- Solid white road -->
-        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
-              stroke="rgba(255,255,255,0.95)" stroke-width="11" fill="none" stroke-linecap="round"/>
-
-        <!-- Day 1 dash (orange) -->
-        <path id="dayPath1" d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122"
-              stroke="#FF7E21" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:1;transition:opacity 0.35s ease"/>
-        <!-- Day 2 dash (pink) -->
-        <path id="dayPath2" d="M355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120"
-              stroke="#F730B6" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
-        <!-- Day 3 dash (purple) -->
-        <path id="dayPath3" d="M752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132"
-              stroke="#5D30F7" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
-        <!-- Day 4 dash (green) -->
-        <path id="dayPath4" d="M1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124"
-              stroke="#059669" stroke-width="4" fill="none" stroke-linecap="round"
-              stroke-dasharray="16 16" style="animation:flowDash 0.65s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
-
-        <!-- Stems + road dots (drawn in SVG so they sit exactly on path) -->
-        <line x1="20" y1="118" x2="20" y2="140" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="20" cy="140" r="4" fill="#5D30F7" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="229" y1="86" x2="229" y2="108" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="229" cy="108" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="355" y1="100" x2="355" y2="122" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="355" cy="122" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="562" y1="108" x2="562" y2="130" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="562" cy="130" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="703" y1="96" x2="703" y2="118" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="703" cy="118" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="752" y1="98" x2="752" y2="120" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="752" cy="120" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="982" y1="94" x2="982" y2="116" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="982" cy="116" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="1147" y1="110" x2="1147" y2="132" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="1147" cy="132" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-        <line x1="1532" y1="102" x2="1532" y2="124" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
-        <circle cx="1532" cy="124" r="4" fill="#FF7E21" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+        <defs><style>@keyframes flowDash{to{stroke-dashoffset:-22}}</style></defs>
+        <!-- Glow -->
+        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124" stroke="rgba(255,255,255,0.18)" stroke-width="20" fill="none" stroke-linecap="round"/>
+        <!-- White road 8px -->
+        <path d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124" stroke="rgba(255,255,255,0.96)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path id="dayPath1" d="M20,140 C60,140 90,100 140,110 C180,118 210,126 229,108 C250,90 280,100 310,112 C330,120 345,124 355,122" stroke="#FF7E21" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="12 10" style="animation:flowDash 0.7s linear infinite;opacity:1;transition:opacity 0.35s ease"/>
+        <path id="dayPath2" d="M355,122 C375,118 400,108 430,114 C460,120 490,130 520,128 C540,127 555,130 562,130 C575,128 610,122 640,116 C660,112 680,116 703,118 C720,120 735,120 752,120" stroke="#F730B6" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="12 10" style="animation:flowDash 0.7s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+        <path id="dayPath3" d="M752,120 C790,120 830,114 870,112 C910,110 940,114 982,116 C1010,118 1060,128 1100,132 C1120,134 1135,134 1147,132" stroke="#5D30F7" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="12 10" style="animation:flowDash 0.7s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+        <path id="dayPath4" d="M1147,132 C1190,128 1250,114 1340,118 C1420,122 1480,124 1532,124" stroke="#059669" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="12 10" style="animation:flowDash 0.7s linear infinite;opacity:0;transition:opacity 0.35s ease"/>
+        <line x1="20" y1="116" x2="20" y2="135" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="20" cy="140" r="4.5" fill="#5D30F7" stroke="white" stroke-width="1.5"/>
+        <line x1="229" y1="84" x2="229" y2="103" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="229" cy="108" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="355" y1="98" x2="355" y2="117" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="355" cy="122" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="562" y1="106" x2="562" y2="125" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="562" cy="130" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="703" y1="94" x2="703" y2="113" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="703" cy="118" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="752" y1="96" x2="752" y2="115" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="752" cy="120" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="982" y1="92" x2="982" y2="111" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="982" cy="116" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="1147" y1="108" x2="1147" y2="127" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="1147" cy="132" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
+        <line x1="1532" y1="100" x2="1532" y2="119" stroke="rgba(255,255,255,0.72)" stroke-width="1" stroke-dasharray="3,3"/>
+        <circle cx="1532" cy="124" r="4.5" fill="#FF7E21" stroke="white" stroke-width="1.5"/>
       </svg>
 
-      <!-- PIN ICONS (absolutely positioned, centered on stop x) -->
-      <div class="stop-pin active-day" style="left:8px;top:94px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#5D30F7"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:217px;top:62px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:343px;top:76px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:550px;top:84px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:691px;top:72px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:740px;top:74px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:970px;top:70px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:1135px;top:86px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
-      <div class="stop-pin" style="left:1520px;top:78px" data-day="4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <!-- PINS (z-index:10 above SVG) -->
+      <div class="stop-pin active-day" style="left:8px;top:92px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#5D30F7"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:217px;top:60px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:343px;top:74px" data-day="1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:550px;top:82px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:691px;top:70px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:740px;top:72px" data-day="2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:970px;top:68px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:1135px;top:84px" data-day="3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
+      <div class="stop-pin" style="left:1520px;top:76px" data-day="4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.117 23.569C14.419 22.193 16.775 19.72 18.863 17.622C22.843 13.622 23.114 6.795 19.086 2.845C17.151.947 14.633-.001 12.115 0C9.597 0 7.08.947 5.144 2.845C1.113 6.796 1.386 13.623 5.367 17.623C7.456 19.722 9.816 22.195 11.118 23.57C11.661 24.144 12.573 24.143 13.116 23.57L13.117 23.569Z" fill="#FF7E21"/><path d="M12.116 12.912C13.749 12.912 15.072 11.588 15.072 9.956C15.072 8.323 13.749 7 12.116 7C10.483 7 9.16 8.323 9.16 9.956C9.16 11.588 10.483 12.912 12.116 12.912Z" fill="#FBFBFB"/></svg></div>
 
-      <!-- PLACE LABELS (below road) -->
-      <div class="pin-label" style="left:20px;top:152px">Từ Sơn</div>
-      <div class="pin-label" style="left:229px;top:120px">Làng Sen Quê Bác</div>
-      <div class="pin-label" style="left:355px;top:134px">Cửa Lò</div>
-      <div class="pin-label" style="left:562px;top:142px">Đền thờ vua Quang Trung</div>
-      <div class="pin-label" style="left:703px;top:130px">Vin Wonder</div>
-      <div class="pin-label" style="left:752px;top:132px">Cửa Lò</div>
-      <div class="pin-label" style="left:982px;top:128px">Ngã Ba Đồng Lộc</div>
-      <div class="pin-label" style="left:1147px;top:144px">Thiên Cầm</div>
-      <div class="pin-label" style="left:1532px;top:136px">Từ Sơn</div>
+      <!-- LABELS (below road) -->
+      <div class="pin-label" style="left:20px;top:154px">Từ Sơn</div>
+      <div class="pin-label" style="left:229px;top:122px">Làng Sen Quê Bác</div>
+      <div class="pin-label" style="left:355px;top:136px">Cửa Lò</div>
+      <div class="pin-label" style="left:562px;top:144px">Đền thờ vua Quang Trung</div>
+      <div class="pin-label" style="left:703px;top:132px">Vin Wonder</div>
+      <div class="pin-label" style="left:752px;top:134px">Cửa Lò</div>
+      <div class="pin-label" style="left:982px;top:130px">Ngã Ba Đồng Lộc</div>
+      <div class="pin-label" style="left:1147px;top:146px">Thiên Cầm</div>
+      <div class="pin-label" style="left:1532px;top:138px">Từ Sơn</div>
 
-      <!-- DISTANCE BADGES (above road, between pins) -->
-      <div class="dist-badge" style="left:124px;top:76px"><span>312 km</span><span>5 giờ 50 phút</span></div>
-      <div class="dist-badge" style="left:292px;top:67px"><span>27 km</span><span>40 phút</span></div>
-      <div class="dist-badge" style="left:458px;top:78px"><span>22 km</span><span>32 phút</span></div>
-      <div class="dist-badge" style="left:632px;top:76px"><span>22 km</span><span>32 phút</span></div>
-      <div class="dist-badge" style="left:727px;top:71px"><span>1 km</span><span>10 phút</span></div>
-      <div class="dist-badge" style="left:867px;top:70px"><span>58 km</span><span>1 giờ 10 phút</span></div>
-      <div class="dist-badge" style="left:1064px;top:76px"><span>47 km</span><span>1 giờ 7 phút</span></div>
-      <div class="dist-badge" style="left:1339px;top:80px"><span>390 km</span><span>6 giờ 14 phút</span></div>
+      <!-- BADGES (well above road, z-index:8) -->
+      <div class="dist-badge" style="left:124px;top:62px"><span>312 km</span><span>5 giờ 50 phút</span></div>
+      <div class="dist-badge" style="left:292px;top:53px"><span>27 km</span><span>40 phút</span></div>
+      <div class="dist-badge" style="left:458px;top:64px"><span>22 km</span><span>32 phút</span></div>
+      <div class="dist-badge" style="left:632px;top:62px"><span>22 km</span><span>32 phút</span></div>
+      <div class="dist-badge" style="left:727px;top:57px"><span>1 km</span><span>10 phút</span></div>
+      <div class="dist-badge" style="left:867px;top:56px"><span>58 km</span><span>1 giờ 10 phút</span></div>
+      <div class="dist-badge" style="left:1064px;top:62px"><span>47 km</span><span>1 giờ 7 phút</span></div>
+      <div class="dist-badge" style="left:1339px;top:66px"><span>390 km</span><span>6 giờ 14 phút</span></div>
 
     </div>
   </div>
@@ -1116,34 +1098,25 @@
       }
     });
 
-    // Update pin highlights — SVG is direct child of .stop-pin
+    // Update pin icon fills + dots
     document.querySelectorAll('.stop-pin').forEach(pin => {
       pin.classList.remove('active-day');
-      const mainPath = pin.querySelector('path:first-child');
-      if (mainPath) mainPath.setAttribute('fill', '#FF7E21');
-      // also reset dot in SVG canvas
+      const p = pin.querySelector('path');
+      if (p) p.setAttribute('fill', '#FF7E21');
     });
-    // SVG road dots: all reset to orange, active day → purple
-    document.querySelectorAll('.route-svg circle').forEach(c => {
-      c.setAttribute('fill', '#FF7E21');
+    document.querySelectorAll('.route-svg circle').forEach(c => c.setAttribute('fill', '#FF7E21'));
+
+    // Activate pins + dots for current day
+    const allPins = Array.from(document.querySelectorAll('.stop-pin'));
+    const allDots = Array.from(document.querySelectorAll('.route-svg circle'));
+    allPins.forEach((pin, i) => {
+      if (+pin.dataset.day === day) {
+        pin.classList.add('active-day');
+        const p = pin.querySelector('path');
+        if (p) p.setAttribute('fill', '#5D30F7');
+        if (allDots[i]) allDots[i].setAttribute('fill', '#5D30F7');
+      }
     });
-    document.querySelectorAll('.stop-pin[data-day="' + day + '"]').forEach(pin => {
-      pin.classList.add('active-day');
-      const mainPath = pin.querySelector('path:first-child');
-      if (mainPath) mainPath.setAttribute('fill', '#5D30F7');
-    });
-    // Color the SVG dots for the active day's stops
-    const dayPins = document.querySelectorAll('.stop-pin[data-day="' + day + '"]');
-    if (dayPins.length > 0) {
-      // Find matching circles by index in route-track
-      const allPins = Array.from(document.querySelectorAll('.stop-pin'));
-      const allCircles = Array.from(document.querySelectorAll('.route-svg circle'));
-      allPins.forEach((pin, i) => {
-        if (+pin.dataset.day === day && allCircles[i]) {
-          allCircles[i].setAttribute('fill', '#5D30F7');
-        }
-      });
-    }
 
     // Scroll route if triggered by tab click
     if (!fromScroll) {

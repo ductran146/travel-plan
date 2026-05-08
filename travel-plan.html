@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Plan – Hành Trình Nghệ An 4 Ngày</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #5D30F7;
+    --primary-dark: #4520c8;
+    --accent: #FF7E21;
+    --accent2: #F730B6;
+    --bg: #F9FAFB;
+    --white: #FFFFFF;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-muted: #9CA3AF;
+    --border: rgba(17,24,39,0.08);
+    --card-bg: #FFFFFF;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 32px rgba(93,48,247,0.16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ──────────── STATUS BAR ──────────── */
+  .status-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 44px;
+    background: var(--primary);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 20px 6px;
+    font-family: 'Sora', sans-serif;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 600; color: white; }
+  .status-bar .icons { display: flex; gap: 6px; align-items: center; }
+  .status-bar .icons svg { width: 16px; height: 12px; fill: white; }
+  .battery-icon {
+    width: 25px; height: 13px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 3px;
+    padding: 2px;
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .battery-icon::after {
+    content: '';
+    position: absolute; right: -5px; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 6px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 1px;
+  }
+  .battery-fill { background: white; border-radius: 1px; flex: 1; height: 100%; }
+
+  /* ──────────── HEADER HERO ──────────── */
+  .hero {
+    position: relative;
+    background: var(--primary);
+    padding: 44px 0 0;
+    overflow: hidden;
+  }
+  .hero-glow1 {
+    position: absolute; width: 240px; height: 240px;
+    right: -40px; top: -40px;
+    background: rgba(247, 48, 182, 0.25);
+    filter: blur(60px); border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute; width: 240px; height: 240px;
+    left: -60px; bottom: 20px;
+    background: rgba(255, 126, 33, 0.25);
+    filter: blur(60px); border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 16px 20px 0;
+  }
+  .hero-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .hero-name {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: white; line-height: 1.2;
+  }
+  .hero-meta {
+    display: flex; gap: 16px; margin-top: 8px;
+  }
+  .hero-meta span {
+    font-size: 12px; color: rgba(255,255,255,0.7);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .hero-meta svg { width: 12px; height: 12px; fill: rgba(255,255,255,0.6); }
+
+  /* ──────────── ROUTE STRIP ──────────── */
+  .route-wrapper {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 16px 20px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    cursor: grab;
+    user-select: none;
+  }
+  .route-wrapper::-webkit-scrollbar { display: none; }
+  .route-wrapper.grabbing { cursor: grabbing; }
+
+  .route-track {
+    position: relative;
+    width: 1600px;
+    height: 190px;
+    flex-shrink: 0;
+  }
+
+  /* Path SVG */
+  .route-svg {
+    position: absolute;
+    top: 36px; left: 0;
+    width: 100%; height: 80px;
+    pointer-events: none;
+  }
+
+  /* Stop pin */
+  .stop-pin {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .stop-pin:hover { transform: translateY(-2px); }
+  .pin-icon {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 8px rgba(255,126,33,0.5);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .pin-icon.active-pin {
+    background: var(--primary);
+    box-shadow: 0 2px 12px rgba(93,48,247,0.6);
+  }
+  .pin-icon::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: white;
+    border-radius: 50%;
+    transform: rotate(45deg);
+  }
+  .pin-stem {
+    width: 1px; height: 0px;
+    background: rgba(255,255,255,0.6);
+    border-left: 1px dashed rgba(255,255,255,0.7);
+    transition: height 0.3s;
+  }
+  .pin-label {
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 11px; font-weight: 500;
+    color: white;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 64px;
+    white-space: normal;
+    word-break: keep-all;
+    hyphens: none;
+    margin-top: 2px;
+    opacity: 0.9;
+  }
+
+  /* Distance badge */
+  .dist-badge {
+    position: absolute;
+    top: 0;
+    background: rgba(255,255,255,0.96);
+    border-radius: 8px;
+    padding: 3px 8px;
+    display: flex; flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    font-size: 10px; font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    pointer-events: none;
+  }
+  /* Caret */
+  .dist-badge::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(255,255,255,0.96);
+    border-bottom: 0;
+  }
+
+  /* Day highlight indicator */
+  .day-indicator {
+    position: absolute; bottom: 0;
+    height: 3px; border-radius: 2px;
+    transition: all 0.4s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+
+  /* ──────────── TAB BAR ──────────── */
+  .tab-bar {
+    background: white;
+    padding: 16px 20px;
+    display: flex; gap: 8px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 44px; z-index: 50;
+    box-shadow: var(--shadow-sm);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .tab-btn .tab-day {
+    font-family: 'Sora', sans-serif;
+    font-size: 11px; font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  .tab-btn .tab-dest {
+    font-size: 10px; font-weight: 400;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .tab-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+  .tab-btn.active .tab-day,
+  .tab-btn.active .tab-dest { color: white; }
+
+  /* ──────────── SCHEDULE SECTIONS ──────────── */
+  .schedule-container {
+    padding: 20px 20px 100px;
+  }
+
+  .day-section {
+    display: none;
+    animation: fadeSlideIn 0.35s ease forwards;
+  }
+  .day-section.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Summary row */
+  .day-summary {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 16px;
+  }
+  .day-summary-label {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--text-primary);
+  }
+  .day-summary-route {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-primary);
+  }
+  .day-summary-arrow { color: var(--text-muted); font-size: 12px; }
+  .day-stats {
+    display: flex; gap: 6px; margin-top: 8px;
+  }
+  .day-stat {
+    background: #F3F4F6;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .day-stat svg { width: 11px; height: 11px; fill: var(--text-muted); }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* Timeline */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+
+  .tl-item {
+    display: flex; gap: 0; position: relative;
+  }
+
+  .tl-left {
+    width: 56px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 2px;
+  }
+  .tl-time {
+    font-family: 'Sora', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .tl-pin-dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--accent);
+    margin: 6px 0;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .tl-pin-dot.special {
+    background: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  .tl-line {
+    flex: 1;
+    width: 1px;
+    border-left: 1.5px dashed rgba(17,24,39,0.12);
+    margin: 0 auto;
+  }
+  .tl-line-last { display: none; }
+
+  .tl-right {
+    flex: 1;
+    padding: 0 0 20px 12px;
+  }
+  .tl-title {
+    font-size: 14px; font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3; margin-bottom: 2px;
+  }
+  .tl-sub {
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .tl-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tl-tag {
+    font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: 20px;
+    background: #EDE9FE; color: var(--primary);
+  }
+  .tl-tag.orange { background: #FFF0E6; color: var(--accent); }
+  .tl-tag.green  { background: #ECFDF5; color: #059669; }
+  .tl-tag.pink   { background: #FDF2F8; color: #be185d; }
+  .tl-tag.blue   { background: #EFF6FF; color: #2563EB; }
+
+  /* Travel segment card */
+  .tl-travel {
+    background: linear-gradient(120deg, #F9FAFB, #EDE9FE22);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .tl-travel-icon {
+    width: 28px; height: 28px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .tl-travel-icon svg { width: 14px; height: 14px; fill: white; }
+  .tl-travel-info { flex: 1; }
+  .tl-travel-label { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .tl-travel-meta { font-size: 11px; color: var(--text-muted); }
+  .tl-travel-dist {
+    font-family: 'Sora', sans-serif;
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    background: #EDE9FE;
+    padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* ──────────── FLOATING BACK TO TOP ──────────── */
+  .fab {
+    position: fixed;
+    bottom: 28px; right: 20px;
+    width: 44px; height: 44px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: var(--shadow-lg);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    transition: transform 0.2s;
+  }
+  .fab:hover { transform: scale(1.08); }
+  .fab svg { width: 18px; height: 18px; fill: white; }
+
+  /* ──────────── MOBILE CONSTRAINT ──────────── */
+  @media (max-width: 480px) {
+    .hero-name { font-size: 18px; }
+  }
+  @media (min-width: 481px) {
+    body { max-width: 420px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+    .status-bar, .tab-bar { max-width: 420px; }
+    .fab { right: calc(50% - 210px + 20px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span class="time">9:41</span>
+  <div class="icons">
+    <svg viewBox="0 0 20 12"><rect x="0" y="2" width="4" height="10" rx="1"/><rect x="5.5" y="0" width="4" height="12" rx="1" opacity=".4"/><rect x="11" y="0" width="4" height="12" rx="1" opacity=".4"/><rect x="16.5" y="0" width="3.5" height="12" rx="1" opacity=".4"/></svg>
+    <svg viewBox="0 0 18 14"><path d="M9 2.5C11.8 2.5 14.3 3.7 16 5.7L17.5 4C15.4 1.5 12.4 0 9 0 5.6 0 2.6 1.5.5 4L2 5.7C3.7 3.7 6.2 2.5 9 2.5z"/><path d="M9 7.5C10.9 7.5 12.6 8.3 13.8 9.6L15.3 7.9C13.7 6.1 11.5 5 9 5s-4.7 1.1-6.3 2.9L4.2 9.6C5.4 8.3 7.1 7.5 9 7.5z"/><circle cx="9" cy="12" r="2"/></svg>
+    <div class="battery-icon"><div class="battery-fill"></div></div>
+  </div>
+</div>
+
+<!-- HERO + ROUTE -->
+<div class="hero" id="hero">
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-title">Lịch trình du lịch</div>
+    <div class="hero-name">Hành Trình Nghệ An 4 Ngày</div>
+    <div class="hero-meta">
+      <span>
+        <svg viewBox="0 0 12 14"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.75C5.03 6.75 4.25 5.97 4.25 5S5.03 3.25 6 3.25 7.75 4.03 7.75 5 6.97 6.75 6 6.75z"/></svg>
+        Từ Sơn → Cửa Lò
+      </span>
+      <span>
+        <svg viewBox="0 0 12 12"><path d="M6 0a6 6 0 100 12A6 6 0 006 0zm.75 8.5H5.5V5.5h1.25V8.5zm0-4H5.5V3.25h1.25V4.5z"/></svg>
+        4 ngày · 3 đêm
+      </span>
+    </div>
+  </div>
+
+  <!-- ROUTE SCROLLABLE -->
+  <div class="route-wrapper" id="routeWrapper">
+    <div class="route-track" id="routeTrack">
+
+      <!-- SVG PATH -->
+      <svg class="route-svg" viewBox="0 0 1600 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- White glow border -->
+        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <!-- Dashed dark line -->
+        <path d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60 C1200,64 1300,30 1532,52" stroke="#424754" stroke-width="1.5" stroke-dasharray="6,4" fill="none" stroke-linecap="round"/>
+        <!-- Day 1 segment highlight -->
+        <path id="dayPath1" d="M24,62 C80,62 100,18 217,38 C270,48 310,60 355,50" stroke="#FF7E21" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
+        <!-- Day 2 segment highlight -->
+        <path id="dayPath2" d="M355,50 C400,40 450,62 550,58 C610,55 640,40 690,46 C710,50 720,50 740,48" stroke="#F730B6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
+        <!-- Day 3 segment highlight -->
+        <path id="dayPath3" d="M740,48 C810,38 860,50 970,44 C1040,38 1090,56 1135,60" stroke="#5D30F7" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
+        <!-- Day 4 segment highlight -->
+        <path id="dayPath4" d="M1135,60 C1200,64 1300,30 1532,52" stroke="#059669" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
+      </svg>
+
+      <!-- DISTANCE BADGES -->
+      <!-- Day1: Từ Sơn → Làng Sen 312km -->
+      <div class="dist-badge" style="left:80px; top:0px; min-width:72px;">
+        <span>312 km</span><span>5 giờ 50 ph</span>
+      </div>
+      <!-- Làng Sen → Cửa Lò 27km -->
+      <div class="dist-badge" style="left:258px; top:20px; min-width:56px;">
+        <span>27 km</span><span>40 phút</span>
+      </div>
+      <!-- Day2: Cửa Lò → Đền QT 22km -->
+      <div class="dist-badge" style="left:408px; top:4px; min-width:56px;">
+        <span>22 km</span><span>32 phút</span>
+      </div>
+      <!-- Đền QT → Vin Wonder 22km -->
+      <div class="dist-badge" style="left:568px; top:10px; min-width:56px;">
+        <span>22 km</span><span>32 phút</span>
+      </div>
+      <!-- Vin → Cửa Lò 1km -->
+      <div class="dist-badge" style="left:672px; top:12px; min-width:48px;">
+        <span>1 km</span><span>10 phút</span>
+      </div>
+      <!-- Day3: Cửa Lò → Ngã Ba 58km -->
+      <div class="dist-badge" style="left:822px; top:12px; min-width:72px;">
+        <span>58 km</span><span>1 giờ 10 ph</span>
+      </div>
+      <!-- Ngã Ba → Thiên Cầm 47km -->
+      <div class="dist-badge" style="left:1000px; top:4px; min-width:72px;">
+        <span>47 km</span><span>1 giờ 7 ph</span>
+      </div>
+      <!-- Day4: Thiên Cầm → Từ Sơn 390km -->
+      <div class="dist-badge" style="left:1300px; top:0px; min-width:72px;">
+        <span>390 km</span><span>6 giờ 14 ph</span>
+      </div>
+
+      <!-- STOP PINS (left position = x on path, top = below curve) -->
+      <!-- 0: Từ Sơn (xuất phát) -->
+      <div class="stop-pin active-stop" style="left:8px; top:50px;" data-day="1">
+        <div class="pin-icon active-pin"></div>
+        <div class="pin-stem" style="height:32px;"></div>
+        <div class="pin-label">Từ Sơn</div>
+      </div>
+      <!-- 1: Làng Sen Quê Bác -->
+      <div class="stop-pin" style="left:205px; top:22px;" data-day="1">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:40px;"></div>
+        <div class="pin-label">Làng Sen Quê Bác</div>
+      </div>
+      <!-- 2: Cửa Lò (check-in) -->
+      <div class="stop-pin" style="left:340px; top:36px;" data-day="1">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:52px;"></div>
+        <div class="pin-label">Cửa Lò</div>
+      </div>
+      <!-- 3: Đền thờ vua Quang Trung -->
+      <div class="stop-pin" style="left:535px; top:44px;" data-day="2">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:30px;"></div>
+        <div class="pin-label">Đền Vua Quang Trung</div>
+      </div>
+      <!-- 4: Vin Wonder -->
+      <div class="stop-pin" style="left:680px; top:32px;" data-day="2">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:40px;"></div>
+        <div class="pin-label">Vin Wonder</div>
+      </div>
+      <!-- 5: Cửa Lò (back) -->
+      <div class="stop-pin" style="left:728px; top:34px;" data-day="2">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:52px;"></div>
+        <div class="pin-label">Cửa Lò</div>
+      </div>
+      <!-- 6: Ngã Ba Đồng Lộc -->
+      <div class="stop-pin" style="left:958px; top:30px;" data-day="3">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:40px;"></div>
+        <div class="pin-label">Ngã Ba Đồng Lộc</div>
+      </div>
+      <!-- 7: Thiên Cầm -->
+      <div class="stop-pin" style="left:1125px; top:46px;" data-day="3">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:28px;"></div>
+        <div class="pin-label">Thiên Cầm</div>
+      </div>
+      <!-- 8: Từ Sơn (về) -->
+      <div class="stop-pin" style="left:1516px; top:36px;" data-day="4">
+        <div class="pin-icon"></div>
+        <div class="pin-stem" style="height:44px;"></div>
+        <div class="pin-label">Từ Sơn</div>
+      </div>
+
+    </div><!-- /route-track -->
+  </div><!-- /route-wrapper -->
+
+  <!-- BOTTOM FADE -->
+  <div style="height:24px; background: linear-gradient(to bottom, transparent, var(--primary));"></div>
+</div><!-- /hero -->
+
+<!-- TAB BAR -->
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-day="1" onclick="switchDay(1)">
+    <span class="tab-day">Ngày 1</span>
+    <span class="tab-dest">Từ Sơn → Cửa Lò</span>
+  </button>
+  <button class="tab-btn" data-day="2" onclick="switchDay(2)">
+    <span class="tab-day">Ngày 2</span>
+    <span class="tab-dest">Khám phá Nghệ An</span>
+  </button>
+  <button class="tab-btn" data-day="3" onclick="switchDay(3)">
+    <span class="tab-day">Ngày 3</span>
+    <span class="tab-dest">Đồng Lộc · Thiên Cầm</span>
+  </button>
+  <button class="tab-btn" data-day="4" onclick="switchDay(4)">
+    <span class="tab-day">Ngày 4</span>
+    <span class="tab-dest">Về Từ Sơn</span>
+  </button>
+</div>
+
+<!-- SCHEDULE -->
+<div class="schedule-container" id="scheduleContainer">
+
+  <!-- ══ NGÀY 1 ══ -->
+  <div class="day-section active" id="day1">
+    <div class="day-summary">
+      <div>
+        <div class="day-summary-route">
+          <span>Từ Sơn</span>
+          <span class="day-summary-arrow">→</span>
+          <span>Cửa Lò</span>
+        </div>
+        <div class="day-stats">
+          <span class="day-stat">
+            <svg viewBox="0 0 12 12"><path d="M6 0a6 6 0 100 12A6 6 0 006 0zm.75 8.5H5.5V5.5h1.25V8.5zm0-4H5.5V3.25h1.25V4.5z"/></svg>
+            ~340 km
+          </span>
+          <span class="day-stat">
+            <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke-width="1" stroke="currentColor" fill="none"/><path d="M6 3v3.5l2.5 1.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+            6 giờ 30 phút
+          </span>
+          <span class="day-stat" style="background:#FFF0E6; color:var(--accent);">Ngày 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">5:30</span>
+          <div class="tl-pin-dot special"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Xuất phát từ Từ Sơn</div>
+          <div class="tl-sub">Nhà riêng – Từ Sơn, Bắc Ninh</div>
+          <div class="tl-tags">
+            <span class="tl-tag orange">Điểm xuất phát</span>
+            <span class="tl-tag">Đổ xăng đầy bình</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Làng Sen Quê Bác</div>
+              <div class="tl-travel-meta">Cao tốc Hà Nội – Vinh</div>
+            </div>
+            <span class="tl-travel-dist">312 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">10:10</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Làng Sen Quê Bác</div>
+          <div class="tl-sub">Nam Đàn, Nghệ An</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Di tích lịch sử</span>
+            <span class="tl-tag blue">Thăm quan ~1.5h</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Cửa Lò</div>
+              <div class="tl-travel-meta">QL46 · Nam Đàn → Cửa Lò</div>
+            </div>
+            <span class="tl-travel-dist">27 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">11:40</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Check-in khách sạn</div>
+          <div class="tl-sub">Đường Bình Minh, Cửa Lò</div>
+          <div class="tl-tags">
+            <span class="tl-tag green">Nghỉ ngơi</span>
+            <span class="tl-tag">Ăn trưa hải sản</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">14:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Tắm biển Cửa Lò</div>
+          <div class="tl-sub">Bãi tắm Cửa Lò, Nghệ An</div>
+          <div class="tl-tags">
+            <span class="tl-tag blue">Biển cả</span>
+            <span class="tl-tag orange">Buổi chiều</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">18:30</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line tl-line-last"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn tối · Dạo phố đêm Cửa Lò</div>
+          <div class="tl-sub">Chợ đêm hải sản Cửa Lò</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Ẩm thực</span>
+            <span class="tl-tag">Mực nướng · Sò huyết</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NGÀY 2 ══ -->
+  <div class="day-section" id="day2">
+    <div class="day-summary">
+      <div>
+        <div class="day-summary-route">
+          <span>Khám phá Nghệ An</span>
+        </div>
+        <div class="day-stats">
+          <span class="day-stat">~45 km</span>
+          <span class="day-stat">~2 giờ di chuyển</span>
+          <span class="day-stat" style="background:#FDF2F8; color:#be185d;">Ngày 2</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">7:00</span>
+          <div class="tl-pin-dot special"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn sáng – Bánh mì cá thu Cửa Lò</div>
+          <div class="tl-sub">Đặc sản địa phương</div>
+          <div class="tl-tags">
+            <span class="tl-tag orange">Ăn sáng</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Đền thờ Vua Quang Trung</div>
+              <div class="tl-travel-meta">QL1A · Cửa Lò → Vinh</div>
+            </div>
+            <span class="tl-travel-dist">22 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">8:30</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Đền thờ Vua Quang Trung</div>
+          <div class="tl-sub">Hưng Dũng, Vinh, Nghệ An</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Di tích lịch sử</span>
+            <span class="tl-tag blue">Thăm quan ~1h</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Vin Wonder Cửa Hội</div>
+              <div class="tl-travel-meta">Vinh → Cửa Hội</div>
+            </div>
+            <span class="tl-travel-dist">22 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">10:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Vin Wonder Cửa Hội</div>
+          <div class="tl-sub">Nghi Xuân, Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Vui chơi giải trí</span>
+            <span class="tl-tag blue">Cả gia đình</span>
+            <span class="tl-tag orange">~3–4 giờ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Trở về Cửa Lò</div>
+              <div class="tl-travel-meta">Cửa Hội → Cửa Lò</div>
+            </div>
+            <span class="tl-travel-dist">1 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">15:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Tắm biển buổi chiều</div>
+          <div class="tl-sub">Bãi tắm 2 – Cửa Lò</div>
+          <div class="tl-tags">
+            <span class="tl-tag blue">Biển</span>
+            <span class="tl-tag green">Thư giãn</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">19:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line tl-line-last"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn tối hải sản đặc sản</div>
+          <div class="tl-sub">Nhà hàng ven biển Cửa Lò</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Ẩm thực</span>
+            <span class="tl-tag">Ghẹ · Tôm · Ốc</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NGÀY 3 ══ -->
+  <div class="day-section" id="day3">
+    <div class="day-summary">
+      <div>
+        <div class="day-summary-route">
+          <span>Cửa Lò</span>
+          <span class="day-summary-arrow">→</span>
+          <span>Thiên Cầm</span>
+        </div>
+        <div class="day-stats">
+          <span class="day-stat">~105 km</span>
+          <span class="day-stat">~2 giờ 17 phút</span>
+          <span class="day-stat" style="background:#EDE9FE; color:var(--primary);">Ngày 3</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">7:30</span>
+          <div class="tl-pin-dot special"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn sáng – Check-out khách sạn</div>
+          <div class="tl-sub">Cửa Lò, Nghệ An</div>
+          <div class="tl-tags">
+            <span class="tl-tag orange">Xuất phát sớm</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Ngã Ba Đồng Lộc</div>
+              <div class="tl-travel-meta">QL1A · Cửa Lò → Can Lộc, Hà Tĩnh</div>
+            </div>
+            <span class="tl-travel-dist">58 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">9:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ngã Ba Đồng Lộc</div>
+          <div class="tl-sub">Can Lộc, Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Di tích lịch sử</span>
+            <span class="tl-tag">10 cô gái anh hùng</span>
+            <span class="tl-tag blue">~1.5 giờ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Di chuyển → Bãi Biển Thiên Cầm</div>
+              <div class="tl-travel-meta">ĐT546 · Đồng Lộc → Thiên Cầm</div>
+            </div>
+            <span class="tl-travel-dist">47 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">11:30</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Check-in khách sạn Thiên Cầm</div>
+          <div class="tl-sub">Thiên Cầm, Cẩm Xuyên, Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag green">Nghỉ ngơi</span>
+            <span class="tl-tag orange">Ăn trưa</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">14:30</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Tắm biển Thiên Cầm</div>
+          <div class="tl-sub">Bãi biển đẹp nổi tiếng Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag blue">Biển hoang sơ</span>
+            <span class="tl-tag">Buổi chiều</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">17:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ngắm hoàng hôn trên biển</div>
+          <div class="tl-sub">Thiên Cầm – điểm hoàng hôn đẹp nhất</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Phong cảnh</span>
+            <span class="tl-tag orange">Chụp ảnh</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">19:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line tl-line-last"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn tối · Nghỉ đêm tại Thiên Cầm</div>
+          <div class="tl-sub">Nhà hàng hải sản Thiên Cầm</div>
+          <div class="tl-tags">
+            <span class="tl-tag pink">Ẩm thực</span>
+            <span class="tl-tag green">Đêm nghỉ ngơi</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ NGÀY 4 ══ -->
+  <div class="day-section" id="day4">
+    <div class="day-summary">
+      <div>
+        <div class="day-summary-route">
+          <span>Thiên Cầm</span>
+          <span class="day-summary-arrow">→</span>
+          <span>Từ Sơn</span>
+        </div>
+        <div class="day-stats">
+          <span class="day-stat">~390 km</span>
+          <span class="day-stat">~6 giờ 14 phút</span>
+          <span class="day-stat" style="background:#ECFDF5; color:#059669;">Ngày 4</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">6:30</span>
+          <div class="tl-pin-dot special"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Ăn sáng · Dạo biển buổi sớm</div>
+          <div class="tl-sub">Thiên Cầm, Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag green">Bình minh trên biển</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">8:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Check-out · Chuẩn bị về</div>
+          <div class="tl-sub">Mua đặc sản hải sản khô, nước mắm Hà Tĩnh</div>
+          <div class="tl-tags">
+            <span class="tl-tag orange">Mua quà</span>
+            <span class="tl-tag">Hải sản khô · Nước mắm</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time"></span>
+          <div class="tl-pin-dot" style="background:#e5e7eb; box-shadow: 0 0 0 2px #e5e7eb;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-travel">
+            <div class="tl-travel-icon"><svg viewBox="0 0 16 12"><path d="M15 5H13.5L11 1H5L2.5 5H1a1 1 0 000 2h.5v3h2V5H12v5h2V7h.5a1 1 0 000-2zM6 4.5l1-2h2l1 2H6z"/></svg></div>
+            <div class="tl-travel-info">
+              <div class="tl-travel-label">Khởi hành về Từ Sơn</div>
+              <div class="tl-travel-meta">Cao tốc Bắc – Nam về Hà Nội</div>
+            </div>
+            <span class="tl-travel-dist">390 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">11:00</span>
+          <div class="tl-pin-dot"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Dừng nghỉ · Ăn trưa dọc đường</div>
+          <div class="tl-sub">Dừng tại trạm nghỉ cao tốc Bắc Giang hoặc Ninh Bình</div>
+          <div class="tl-tags">
+            <span class="tl-tag orange">Ăn trưa dọc đường</span>
+            <span class="tl-tag">Nghỉ giải lao</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <span class="tl-time">14:30</span>
+          <div class="tl-pin-dot" style="background:#059669; box-shadow: 0 0 0 2px #059669;"></div>
+          <div class="tl-line tl-line-last"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Về đến Từ Sơn 🎉</div>
+          <div class="tl-sub">Nhà riêng – Từ Sơn, Bắc Ninh</div>
+          <div class="tl-tags">
+            <span class="tl-tag green">Kết thúc hành trình</span>
+            <span class="tl-tag pink">Kỷ niệm đẹp ❤️</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /schedule-container -->
+
+<!-- FAB -->
+<div class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 20 20"><path d="M10 3l-7 7h4v7h6v-7h4l-7-7z"/></svg>
+</div>
+
+<script>
+  // ── DAY CONFIG ──
+  const DAY_CONFIG = {
+    1: { scrollTarget: 0,    pathOpacities: [1, 0, 0, 0] },
+    2: { scrollTarget: 380,  pathOpacities: [0, 1, 0, 0] },
+    3: { scrollTarget: 780,  pathOpacities: [0, 0, 1, 0] },
+    4: { scrollTarget: 1200, pathOpacities: [0, 0, 0, 1] },
+  };
+
+  let currentDay = 1;
+  let isScrollingRoute = false;
+  let isScrollingContent = false;
+
+  function switchDay(day, fromScroll = false) {
+    if (day === currentDay && !fromScroll) return;
+    currentDay = day;
+
+    // Update tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.day === day);
+    });
+
+    // Update sections
+    document.querySelectorAll('.day-section').forEach(sec => {
+      sec.classList.remove('active');
+    });
+    document.getElementById('day' + day).classList.add('active');
+
+    // Update route highlights
+    [1,2,3,4].forEach(d => {
+      const path = document.getElementById('dayPath' + d);
+      if (path) path.style.opacity = DAY_CONFIG[day].pathOpacities[d-1];
+    });
+
+    // Update pin highlights
+    document.querySelectorAll('.pin-icon').forEach(pin => {
+      pin.classList.remove('active-pin');
+    });
+    document.querySelectorAll('.stop-pin[data-day="' + day + '"]').forEach(pin => {
+      pin.querySelector('.pin-icon').classList.add('active-pin');
+    });
+
+    // Scroll route if triggered by tab click
+    if (!fromScroll) {
+      isScrollingRoute = true;
+      routeWrapper.scrollTo({ left: DAY_CONFIG[day].scrollTarget, behavior: 'smooth' });
+      setTimeout(() => { isScrollingRoute = false; }, 600);
+    }
+  }
+
+  // ── ROUTE DRAG SCROLL ──
+  const routeWrapper = document.getElementById('routeWrapper');
+  let isDragging = false, startX, scrollLeft;
+
+  routeWrapper.addEventListener('mousedown', e => {
+    isDragging = true;
+    startX = e.pageX - routeWrapper.offsetLeft;
+    scrollLeft = routeWrapper.scrollLeft;
+    routeWrapper.classList.add('grabbing');
+  });
+  routeWrapper.addEventListener('mouseleave', () => { isDragging = false; routeWrapper.classList.remove('grabbing'); });
+  routeWrapper.addEventListener('mouseup', () => { isDragging = false; routeWrapper.classList.remove('grabbing'); });
+  routeWrapper.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - routeWrapper.offsetLeft;
+    routeWrapper.scrollLeft = scrollLeft - (x - startX);
+  });
+
+  // ── ROUTE SCROLL → UPDATE TAB ──
+  routeWrapper.addEventListener('scroll', () => {
+    if (isScrollingRoute) return;
+    const sl = routeWrapper.scrollLeft;
+    let newDay = 1;
+    if (sl >= 950) newDay = 4;
+    else if (sl >= 560) newDay = 3;
+    else if (sl >= 250) newDay = 2;
+    else newDay = 1;
+    if (newDay !== currentDay) switchDay(newDay, true);
+  });
+
+  // ── CONTENT SCROLL → UPDATE TAB + ROUTE ──
+  const scheduleContainer = document.getElementById('scheduleContainer');
+  window.addEventListener('scroll', () => {
+    if (isScrollingContent) return;
+    const st = window.scrollY;
+    const heroH = document.getElementById('hero').offsetHeight;
+    const tabH = 80;
+    const offset = heroH + tabH;
+    // Approximate section scroll detection via visual position
+    const sections = [1,2,3,4].map(d => document.getElementById('day' + d));
+    // If hero is visible, stay on current day (route visible)
+    if (st < heroH - 100) return;
+  });
+
+  // ── STOP PINS CLICK ──
+  document.querySelectorAll('.stop-pin').forEach(pin => {
+    pin.addEventListener('click', () => {
+      const day = +pin.dataset.day;
+      switchDay(day);
+      // Scroll to schedule
+      document.getElementById('scheduleContainer').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Init
+  switchDay(1);
+</script>
+</body>
+</html>

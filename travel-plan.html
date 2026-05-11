@@ -244,6 +244,8 @@
   .day-section { display:none; }
   .day-section.active { display:block; animation: slideInRight 0.32s cubic-bezier(.4,0,.2,1) both; }
   .day-section.slide-left { animation: slideInLeft 0.32s cubic-bezier(.4,0,.2,1) both; }
+  /* Prevent container from collapsing during tab switch causing scroll jump */
+  .schedule-container { min-height: 600px; }
 
   @keyframes slideInRight { from{opacity:0;transform:translateX(24px)} to{opacity:1;transform:translateX(0)} }
   @keyframes slideInLeft  { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)} }
@@ -1374,6 +1376,9 @@
     const isForward = day > currentDay;
     currentDay = day;
 
+    // Preserve scroll position to prevent page jump on content height change
+    const savedScrollY = window.scrollY;
+
     document.querySelectorAll('.tab-btn').forEach(btn =>
       btn.classList.toggle('active', +btn.dataset.day===day));
 
@@ -1381,6 +1386,9 @@
     const target = document.getElementById('day'+day);
     if (!isForward && !fromScroll) target.classList.add('slide-left');
     target.classList.add('active');
+
+    // Restore scroll position immediately after layout change
+    window.scrollTo(0, savedScrollY);
 
     [1,2,3,4].forEach(d => {
       const p = document.getElementById('dayPath'+d);

@@ -89,9 +89,10 @@
   .hero {
     position: sticky; top:0; z-index:60;
     background: var(--primary);
-    height: 200px;
+    height: 200px; /* updated by JS on init & resize */
     overflow: hidden;
     flex-shrink: 0;
+    transition: height 0.55s cubic-bezier(.4,0,.2,1);
   }
 
   /* scroll edge fade indicators */
@@ -106,15 +107,14 @@
 
   .route-wrapper {
     position: absolute; inset:0;
-    overflow-x: auto; overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; cursor: grab; user-select: none;
+    overflow: hidden;
   }
   .route-wrapper::-webkit-scrollbar { display:none; }
-  .route-wrapper.grabbing { cursor: grabbing; }
 
   .route-track {
     position: relative; width:1553px; height:200px; flex-shrink:0;
+    transform-origin: left top;
+    will-change: transform;
   }
 
   .route-svg {
@@ -1329,38 +1329,66 @@
 </div>
 
 <script>
-  const DAY_CONFIG = {
-    1:{scrollTarget:0}, 2:{scrollTarget:380},
-    3:{scrollTarget:780}, 4:{scrollTarget:1200},
+  /* ── CONFIG ── */
+  // SVG canvas = 1553px wide. Each day's "viewport window" start X in SVG coords:
+  // Day1: 0–430, Day2: 430–770, Day3: 770–1200, Day4: 1200–1553
+  const SVG_W = 1553;
+  const DAY_WIN = {
+    1: { x: 0,    w: 430  },
+    2: { x: 380,  w: 420  },
+    3: { x: 740,  w: 460  },
+    4: { x: 1160, w: 393  },
   };
   const DAY_COLORS = {1:'#FF7E21',2:'#F730B6',3:'#5D30F7',4:'#059669'};
-  let currentDay=1, isScrollingRoute=false;
+  let currentDay = 1;
 
-  /* ── PIN GROW ANIMATION ── */
-  function animatePinsInView() {
-    const wrapper = document.getElementById('routeWrapper');
-    const visL = wrapper.scrollLeft - 20;
-    const visR = visL + wrapper.clientWidth + 80;
+  const routeTrack   = document.querySelector('.route-track');
+  const routeWrapper = document.getElementById('routeWrapper');
+  const fadeL = document.getElementById('fadel');
+  const fadeR = document.getElementById('fader');
+  const heroEl = document.getElementById('hero');
+
+  /* ── SCALE: fit viewport, pan to active day window ── */
+  function applyRouteTransform(day, animate) {
+    const vw   = routeWrapper.clientWidth || window.innerWidth;
+    const win  = DAY_WIN[day];
+    const scale = vw / win.w;
+    const tx    = -win.x * scale;
+
+    const minTx = -(SVG_W * scale - vw);
+    const safeTx = Math.max(minTx, Math.min(0, tx));
+
+    routeTrack.style.transition = animate
+      ? 'transform 0.55s cubic-bezier(.4,0,.2,1)' : 'none';
+    routeTrack.style.transform  = `translateX(${safeTx}px) scale(${scale})`;
+
+    // Update hero height to match scaled track height
+    const scaledH = Math.round(200 * scale);
+    heroEl.style.height = scaledH + 'px';
+
+    fadeL.classList.add('hidden');
+    fadeR.classList.add('hidden');
+  }
+
+  /* ── PIN ANIMATION ── */
+  function animatePinsForDay(day) {
     const allPins  = Array.from(document.querySelectorAll('.stop-pin'));
     const allStems = Array.from(document.querySelectorAll('.stem-line'));
 
-    // Reset out-of-view pins
+    // Reset all
     allPins.forEach((pin, i) => {
-      const x = parseInt(pin.style.left) + 12;
-      if (x < visL || x > visR) {
-        pin.classList.remove('pin-visible','pin-glow');
-        if (allStems[i]) allStems[i].classList.remove('stem-visible');
-      }
+      pin.classList.remove('pin-visible','pin-glow');
+      if (allStems[i]) allStems[i].classList.remove('stem-visible');
     });
 
-    // Collect in-view pins, stagger left-to-right
-    const visible = allPins
+    // Show pins for active day, staggered
+    const dayPins = allPins
       .map((pin, i) => ({ pin, stem: allStems[i]||null, x: parseInt(pin.style.left)+12 }))
-      .filter(d => d.x >= visL && d.x <= visR)
+      .filter(d => +d.pin.dataset.day === day)
       .sort((a,b) => a.x - b.x);
 
-    visible.forEach((d, idx) => {
-      const delay = idx * 75;
+    dayPins.forEach((d, idx) => {
+      const delay = idx * 90;
       setTimeout(() => {
         if (d.stem) d.stem.classList.add('stem-visible');
       }, delay);
@@ -1372,11 +1400,10 @@
   }
 
   /* ── SWITCH DAY ── */
-  function switchDay(day, fromScroll=false) {
+  function switchDay(day) {
     const isForward = day > currentDay;
     currentDay = day;
 
-    // Preserve scroll position to prevent page jump on content height change
     const savedScrollY = window.scrollY;
 
     document.querySelectorAll('.tab-btn').forEach(btn =>
@@ -1384,10 +1411,9 @@
 
     document.querySelectorAll('.day-section').forEach(s=>s.classList.remove('active','slide-left'));
     const target = document.getElementById('day'+day);
-    if (!isForward && !fromScroll) target.classList.add('slide-left');
+    if (!isForward) target.classList.add('slide-left');
     target.classList.add('active');
 
-    // Restore scroll position immediately after layout change
     window.scrollTo(0, savedScrollY);
 
     [1,2,3,4].forEach(d => {
@@ -1401,46 +1427,9 @@
       dot.setAttribute('fill', allPins[i] && +allPins[i].dataset.day===day ? DAY_COLORS[day] : '#FF7E21');
     });
 
-    if (!fromScroll) {
-      isScrollingRoute=true;
-      routeWrapper.scrollTo({left:DAY_CONFIG[day].scrollTarget, behavior:'smooth'});
-      setTimeout(() => { isScrollingRoute=false; animatePinsInView(); }, 750);
-    }
+    applyRouteTransform(day, true);
+    setTimeout(() => animatePinsForDay(day), 200);
   }
-
-  /* ── ROUTE SCROLL ── */
-  const routeWrapper = document.getElementById('routeWrapper');
-  const fadeL = document.getElementById('fadel');
-  const fadeR = document.getElementById('fader');
-
-  function updateFades() {
-    const sl = routeWrapper.scrollLeft;
-    const max = routeWrapper.scrollWidth - routeWrapper.clientWidth;
-    fadeL.classList.toggle('hidden', sl < 10);
-    fadeR.classList.toggle('hidden', sl > max - 10);
-  }
-
-  let scrollTimer = null;
-  routeWrapper.addEventListener('scroll', () => {
-    updateFades();
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(animatePinsInView, 160);
-    if (isScrollingRoute) return;
-    const sl = routeWrapper.scrollLeft;
-    const d = sl>=950?4:sl>=560?3:sl>=250?2:1;
-    if (d!==currentDay) switchDay(d,true);
-  });
-
-  /* Drag + touch */
-  let isDragging=false, startX, scrollLeft0;
-  routeWrapper.addEventListener('mousedown', e=>{isDragging=true;startX=e.pageX-routeWrapper.offsetLeft;scrollLeft0=routeWrapper.scrollLeft;routeWrapper.classList.add('grabbing');});
-  routeWrapper.addEventListener('mouseleave',()=>{isDragging=false;routeWrapper.classList.remove('grabbing');});
-  routeWrapper.addEventListener('mouseup',   ()=>{isDragging=false;routeWrapper.classList.remove('grabbing');});
-  routeWrapper.addEventListener('mousemove', e=>{if(!isDragging)return;e.preventDefault();routeWrapper.scrollLeft=scrollLeft0-(e.pageX-routeWrapper.offsetLeft-startX);});
-  let tStartX=0, tScrollL=0;
-  routeWrapper.addEventListener('touchstart',e=>{tStartX=e.touches[0].clientX;tScrollL=routeWrapper.scrollLeft;},{passive:true});
-  routeWrapper.addEventListener('touchmove', e=>{routeWrapper.scrollLeft=tScrollL+(tStartX-e.touches[0].clientX);},{passive:true});
-  routeWrapper.addEventListener('touchend',  ()=>{clearTimeout(scrollTimer);scrollTimer=setTimeout(animatePinsInView,200);});
 
   /* ── TOOLTIPS ── */
   const tooltip = document.createElement('div');
@@ -1462,14 +1451,16 @@
 
   /* ── FAB ── */
   const fab = document.querySelector('.fab');
-  const heroEl = document.getElementById('hero');
   window.addEventListener('scroll',()=>fab.classList.toggle('visible',window.scrollY>heroEl.offsetHeight+80));
   fab.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
+  /* ── RESIZE: re-apply transform on orientation change ── */
+  window.addEventListener('resize', () => applyRouteTransform(currentDay, false));
+
   /* ── INIT ── */
-  updateFades();
+  applyRouteTransform(1, false);
   switchDay(1);
-  setTimeout(animatePinsInView, 350);
+  setTimeout(() => animatePinsForDay(1), 350);
 </script>
 </body>
 </html>
